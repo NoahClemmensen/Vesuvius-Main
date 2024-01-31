@@ -30,6 +30,10 @@ class DatabaseManager {
 
      */
 
+    async GetAvailableTables(selectedTime){
+        // Execute stored procedure with the name: getAvailableTables
+    }
+
     async Query(query) {
         return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
             .then(pool => {

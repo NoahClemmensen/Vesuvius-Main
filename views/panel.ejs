@@ -1,3 +1,30 @@
-<div class="">
-
+<div class="d-flex flex-column">
+    <table class="table">
+        <thead>
+            <th scope="col">Table number</th>
+            <th scope="col">In use</th>
+            <th scope="col">Total reservations</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </thead>
+        <tbody>
+            <% tableData.forEach((item => { %>
+                <tr>
+                    <td><%= item.num %>.</td>
+                    <td><%= item.in_use %></td>
+                    <td><%= item.total_reservations ? item.total_reservations : 0 %></td>
+                    <td>
+                        <% if (item.upcoming > 0) { %>
+                            <div class="alert alert-warning p-1 mb-0 text-center fit-content">
+                                <%= item.upcoming > 0 ? `${item.upcoming} reservation(s) upcoming` : '' %>
+                            </div>
+                        <% } %>
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-success" onclick="alert(<%= item.total_reservations %>)">See details</button>
+                    </td>
+                </tr>
+            <% })) %>
+        </tbody>
+    </table>
 </div>
