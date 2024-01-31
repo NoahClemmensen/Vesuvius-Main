@@ -3,11 +3,16 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const expressLayouts = require('express-ejs-layouts')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+// Set Templating Engine
+app.use(expressLayouts);
+app.set('layout', './layouts/full-width');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
