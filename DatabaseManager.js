@@ -15,6 +15,7 @@ class DatabaseManager {
         return this._instance;
     }
 
+    /*
     async connect() {
         if (this.connected) return;
 
@@ -27,37 +28,20 @@ class DatabaseManager {
         }
     }
 
-    async disconnect() {
-        if (!this.connected) return;
+     */
 
-        try {
-            await sql.close();
-            this.connected = false;
-            console.log("Disconnected from database");
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    async query(query) {
-        var selfConnected = false;
-        if (!this.connected) {
-            await this.connect();
-            selfConnected = true;
-        }
-
-        try {
-            const res = await sql.query(query);
-            console.log(res);
-
-            if (selfConnected) {
-                await this.disconnect();
-            }
-
-            return res;
-        } catch (e) {
-            console.log(e);
-        }
+    async Query(query) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+               return pool.query(query)
+            })
+            .then(result => {
+                return result;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
     }
 }
 
