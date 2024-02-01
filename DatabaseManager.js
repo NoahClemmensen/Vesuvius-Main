@@ -30,8 +30,43 @@ class DatabaseManager {
                 console.log(err);
                 throw err;
             });
+    }
 
+    async MakeReservation(time, name, phone) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: make_reservation
+                const request = new sql.Request();
+                request.input('Time', sql.DateTime, utcTime);
+                request.input('Name', sql.NVarChar, name);
+                request.input('Phone', sql.Int, phone);
+                return request.execute('make_reservation')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
 
+    async AddTableToReservation(table, reservation) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: make_reservation
+                const request = new sql.Request();
+                request.input('table_id', sql.Int, table);
+                request.input('reservation_id', sql.Int, reservation);
+                return request.execute('add_table_reservation')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
     }
 
     async Query(query) {

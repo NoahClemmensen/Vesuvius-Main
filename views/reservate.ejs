@@ -19,7 +19,11 @@
                 <label>Time</label>
                 <input type="datetime-local" id="timeInput" class="form-control" />
             </div>
-            <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
+            <div class="d-flex align-items-center" style="gap:16px;">
+                <button type="submit" class="btn btn-primary " id="submitBtn">Submit</button>
+                <div class="alert alert-danger m-0" id="tableAvailableError" role="alert" style="display: none"></div>
+            </div>
+            <div></div>
         </div>
     </div>
 </div>
