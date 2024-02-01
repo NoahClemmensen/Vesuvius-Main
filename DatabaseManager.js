@@ -15,23 +15,23 @@ class DatabaseManager {
         return this._instance;
     }
 
-    /*
-    async connect() {
-        if (this.connected) return;
-
-        try {
-            await sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False");
-            this.connected = true;
-            console.log("Connected to database");
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-     */
-
     async GetAvailableTables(selectedTime){
-        // Execute stored procedure with the name: getAvailableTables
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('date', sql.DateTime, selectedTime);
+                return request.execute('check_if_table_is_free')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+
+
     }
 
     async Query(query) {

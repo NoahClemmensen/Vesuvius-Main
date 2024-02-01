@@ -1,9 +1,13 @@
+const DatabaseManager = require('../DatabaseManager');
+
 var express = require('express');
 var router = express.Router();
 
+const db = DatabaseManager.getInstance();
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Vesuvius' });
+    res.render('index', { title: 'Vesuvius' });
 });
 
 router.get('/reservate', function(req, res, next) {
