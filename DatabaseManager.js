@@ -37,7 +37,8 @@ class DatabaseManager {
             .then(pool => {
                 // Execute stored procedure with the name: make_reservation
                 const request = new sql.Request();
-                request.input('Time', sql.DateTime, utcTime);
+                console.log("TIME -> " + time)
+                request.input('Time', sql.DateTime, time);
                 request.input('Name', sql.NVarChar, name);
                 request.input('Phone', sql.Int, phone);
                 return request.execute('make_reservation')

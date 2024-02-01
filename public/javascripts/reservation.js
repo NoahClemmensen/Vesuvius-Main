@@ -72,7 +72,8 @@ $(document).ready(function() {
         event.preventDefault();
 
         // Check if all fields are filled
-        datetim
+        //const datetime = new Date();
+        //const utcTime = new Date(datetime.getTime() + -(datetime.getTimezoneOffset() * 60000));
 
         const newReservation = {
             name: sanitizeInput(nameInput.val().trim()),

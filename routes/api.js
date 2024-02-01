@@ -30,6 +30,7 @@ router.post('/getAvailableTables', async function(req, res, next) {
 });
 
 router.post('/makeReservation', async function(req, res, next) {
+    console.log("TIME -> " + req.body.time)
     // Check if reservation time is in the future
     const now = new Date();
     const reservationTime = new Date(req.body.time);
@@ -52,6 +53,7 @@ router.post('/makeReservation', async function(req, res, next) {
             return;
         }
 
+        console.log("TIME -> " + req.body.time)
         // Make reservation
         const result = await db.MakeReservation(
             req.body.time,
