@@ -12,6 +12,8 @@ var usersRouter = require('./routes/users');
 var panelRouter = require('./routes/panel');
 var apiRouter = require('./routes/api');
 
+apiRouter.use(cookieParser());
+
 var app = express();
 
 // Set Templating Engine

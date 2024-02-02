@@ -15,8 +15,9 @@
                     </div>
                     <div class="mb-3">
                         <label for="loginPasswordInput" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="loginPasswordInput" placeholder="Password">
+                        <input type="password" class="form-control" id="loginPasswordInput" placeholder="Password">
                     </div>
+                    <div class="mb-3 alert alert-danger" id="errorBox" style="display: none"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="loginSubmitBtn">Login</button>
@@ -47,9 +48,14 @@
                             <a class="nav-link" href="panel/kitchen">Orders</a>
                         </li>
                     </ul>
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="panel/kitchen" data-bs-toggle="modal" data-bs-target="#loginModal" id="loginModalPopupBtn">Login</a>
+                        </li>
+                    </ul>
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="panel/kitchen" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a>
+                            <button class="btn btn-outline-primary" id="cookieCheckerBtn">Cookie checker</button>
                         </li>
                     </ul>
                 </div>

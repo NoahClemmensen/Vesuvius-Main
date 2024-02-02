@@ -118,7 +118,7 @@ $(document).ready(function() {
             .catch(function(err) {
                 console.log(err);
                 showError("An error occurred. Please try again.");
-            })
+            });
     });
 
 

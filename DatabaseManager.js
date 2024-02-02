@@ -52,6 +52,23 @@ class DatabaseManager {
             });
     }
 
+    async CheckForMatchingLogin(username) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: make_reservation
+                const request = new sql.Request();
+                request.input('username', sql.NVarChar, username);
+                return request.execute('login_check')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
     async AddTableToReservation(table, reservation) {
         return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
             .then(pool => {
