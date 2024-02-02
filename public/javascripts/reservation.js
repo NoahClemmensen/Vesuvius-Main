@@ -4,10 +4,12 @@ $(document).ready(function() {
     const guestsInput = $("#guestsInput");
     const timeInput = $("#timeInput");
     const submitBtn = $("#submitBtn");
-    const errorBox = $("#tableAvailableError");
+    const errorBox = $("#tableError");
+    const sucessBox = $("#tableSuccess");
 
     function showError(message) {
         submitBtn.addClass("disabled");
+        hideSucess()
         errorBox.show();
         errorBox.text(message);
     }
@@ -15,6 +17,16 @@ $(document).ready(function() {
     function hideError() {
         submitBtn.removeClass("disabled");
         errorBox.hide();
+    }
+
+    function showSucess(message) {
+        sucessBox.show();
+        hideError()
+        sucessBox.text(message);
+    }
+
+    function hideSucess() {
+        sucessBox.hide();
     }
 
     function validateTimeIsFuture() {
@@ -72,9 +84,18 @@ $(document).ready(function() {
         event.preventDefault();
 
         // Check if all fields are filled
-        //const datetime = new Date();
-        //const utcTime = new Date(datetime.getTime() + -(datetime.getTimezoneOffset() * 60000));
+        if (nameInput.val().trim() === "" || phoneInput.val().trim() === "" || guestsInput.val().trim() === "" || timeInput.val().trim() === "") {
+            showError("All fields must be filled.");
+            return;
+        }
 
+        // Check if phone number is valid (only allow numbers and "+")
+        if (!phoneInput.val().trim().match(/^[0-9+]+$/)) {
+            showError("Phone number is invalid.");
+            return;
+        }
+
+        // Make reservation
         const newReservation = {
             name: sanitizeInput(nameInput.val().trim()),
             phone: sanitizeInput(phoneInput.val().trim()),
@@ -84,7 +105,20 @@ $(document).ready(function() {
 
         console.log(newReservation);
 
-        $.post("/api/makeReservation", newReservation);
+        $.post("/api/makeReservation", newReservation)
+            .then(function(data) {
+                console.log(data);
+                // Tell user that reservation has been made and then empty all fields
+                nameInput.val("");
+                phoneInput.val("");
+                guestsInput.val("");
+                timeInput.val("");
+                showSucess("Reservation has been made.");
+            })
+            .catch(function(err) {
+                console.log(err);
+                showError("An error occurred. Please try again.");
+            })
     });
 
 

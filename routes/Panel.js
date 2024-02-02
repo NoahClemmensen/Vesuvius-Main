@@ -9,8 +9,6 @@ const db = DatabaseManager.getInstance();
 router.get('/', async function (req, res, next) {
     try {
         let result = await db.Query("select * from main_overview");
-        console.log(result.recordset);
-
 
         res.render('panel', {title: 'Panel', panel: true, tableData: result.recordset });
     } catch (err) {

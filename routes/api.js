@@ -4,23 +4,10 @@ var router = express.Router();
 
 const db = DatabaseManager.getInstance();
 
-async function checkAvailableTables(time, guests) {
-    try {
-        const tables = await db.GetAvailableTables(time);
-        const availableTables = tables.length;
-        const tablesNeeded = Math.ceil(guests / 2);
-
-        return tablesNeeded > availableTables
-    } catch (e) {
-        console.log(e);
-        throw e;
-    }
-}
-
 router.post('/getAvailableTables', async function(req, res, next) {
     try {
         const tables = await db.GetAvailableTables(req.body.selectedTime);
-        console.log(tables)
+
         res.send(tables);
         res.status(200);
     } catch (e) {
@@ -30,7 +17,6 @@ router.post('/getAvailableTables', async function(req, res, next) {
 });
 
 router.post('/makeReservation', async function(req, res, next) {
-    console.log("TIME -> " + req.body.time)
     // Check if reservation time is in the future
     const now = new Date();
     const reservationTime = new Date(req.body.time);
@@ -53,7 +39,6 @@ router.post('/makeReservation', async function(req, res, next) {
             return;
         }
 
-        console.log("TIME -> " + req.body.time)
         // Make reservation
         const result = await db.MakeReservation(
             req.body.time,
