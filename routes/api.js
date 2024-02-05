@@ -50,7 +50,6 @@ router.post('/makeReservation', async function(req, res, next) {
             req.body.phone,
         );
         const reservationId = result[0].ReservationId;
-        console.log(reservationId);
 
         // Add tables to reservation
         for (let i = 0; i < tablesNeeded; i++) {
@@ -61,6 +60,7 @@ router.post('/makeReservation', async function(req, res, next) {
         }
 
         res.status(200);
+        res.send("Reservation made successfully");
     } catch (e) {
         console.log(e)
         res.send(e);
@@ -132,6 +132,52 @@ router.get('/checkCookie', function (req, res, next) {
     } else {
         res.status(500);
         res.send();
+    }
+});
+
+router.get('/admin/getMonthlyChart', async function (req, res, next) {
+    const sessionToken = req.cookies['sessionToken'];
+    if (sessionToken === undefined) {
+        res.status(401).send({error: "Unauthorized"});
+        return;
+    }
+
+    const sessionTokenData = sessionTokens.find(token => token.token === sessionToken);
+    if (sessionTokenData === undefined) {
+        res.status(401).send({error: "Unauthorized"});
+        return;
+    }
+
+    try {
+        const sales = await db.GetView("monthly_sales");
+        res.status(200).send(sales);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/getDailyChart', async function (req, res, next) {
+    const sessionToken = req.cookies['sessionToken'];
+    if (sessionToken === undefined) {
+        res.status(401).send({error: "Unauthorized"});
+        return;
+    }
+
+    const sessionTokenData = sessionTokens.find(token => token.token === sessionToken);
+    if (sessionTokenData === undefined) {
+        res.status(401).send({error: "Unauthorized"});
+        return;
+    }
+
+    const yearMonth = req.body.yearMonth;
+
+    try {
+        const sales = await db.GetMonthDailySales(yearMonth);
+        res.status(200).send(sales);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
     }
 });
 

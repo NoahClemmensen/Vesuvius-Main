@@ -2,6 +2,11 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 .wrapper {
   width: 700px;
   margin: 0 auto;

@@ -1,0 +1,28 @@
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
+<script src="/javascripts/admin.js"></script>
+<h1>Monthly profit</h1>
+<div class="d-flex justify-content-center" style="gap: 32px;">
+    <table class="table">
+        <thead>
+        <th scope="col">Month</th>
+        <th scope="col">Purchase price</th>
+        <th scope="col">Retail price</th>
+        <th scope="col">Profit</th>
+        <th scope="col"></th>
+        </thead>
+        <tbody>
+        <% tableData.forEach((item => { %>
+            <tr>
+                <td><%= item.month %></td>
+                <td><%= item.purchase_price %> dkk</td>
+                <td><%= item.retail_price %> dkk</td>
+                <td><%= item.profit %> dkk</td>
+                <td>
+                    <button class="btn btn-outline-success" onclick="redirectToMonth('<%= item.month %>')">See details</button>
+                </td>
+            </tr>
+        <% })) %>
+        </tbody>
+    </table>
+    <div id="monthlyChartContainer" class="sticky-top" style="width: 1000px; height: 400px;"></div>
+</div>

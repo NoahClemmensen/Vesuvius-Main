@@ -87,6 +87,28 @@ class DatabaseManager {
             });
     }
 
+    async GetMonthDailySales(yearMonth) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('year_month', sql.NVarChar, yearMonth);
+                return request.execute('get_daily_sales')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
+    async GetView(viewName) {
+        const result = await this.Query(`SELECT * FROM ${viewName}`);
+        return result.recordset;
+    }
+
     async Query(query) {
         return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
             .then(pool => {
