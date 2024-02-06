@@ -104,6 +104,62 @@ class DatabaseManager {
             });
     }
 
+    async AddCategory(categoryName) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('name', sql.NVarChar, categoryName);
+                return request.execute('Add_category')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
+    async AddMenuItem(itemName, price, description, category_id, retail_price) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('name', sql.NVarChar, itemName);
+                request.input('price', sql.Float, price);
+                request.input('description', sql.NVarChar, description);
+                request.input('category_id', sql.Int, category_id);
+                request.input('retail_price', sql.Float, retail_price);
+                return request.execute('Add_menu_item')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
+    async AddAllergeneToMenuItem(itemId, allergenId) {
+        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('menu_item_id', sql.Int, itemId);
+                request.input('allergen_id', sql.Int, allergenId);
+                return request.execute('Add_item_allergen')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
     async GetView(viewName) {
         const result = await this.Query(`SELECT * FROM ${viewName}`);
         return result.recordset;

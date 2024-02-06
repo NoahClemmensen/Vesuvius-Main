@@ -5,8 +5,47 @@ var express = require('express');
 var router = express.Router();
 
 const db = DatabaseManager.getInstance();
+const adminRoleId = 1;
 
-var sessionTokens = [];
+var sessionTokens = {};
+
+function checkIfHasAdminPermission(cookie) {
+    return cookie.role === adminRoleId;
+}
+
+function checkIfAuthorized(req, res, adminRequired = false) {
+    const sessionToken = req.cookies['sessionToken'];
+    if (sessionToken === undefined) {
+        res.status(401).send({error: "Unauthorized"});
+        return false;
+    }
+
+    const sessionTokenData = sessionTokens[sessionToken];
+    if (sessionTokenData === undefined) {
+        res.status(401).send({error: "Unauthorized"});
+        return false;
+    }
+
+
+    if (adminRequired) {
+        if (!checkIfHasAdminPermission(sessionTokenData)){
+            res.status(401).send({error: "Unauthorized"});
+            return false;
+        } else return true;
+    } else return true;
+}
+
+function jsonToCSV(json) {
+    const keys = Object.keys(json[0]);
+    let csv = keys.join(";") + "\n";
+
+    for (let i = 0; i < json.length; i++) {
+        const values = Object.values(json[i]);
+        csv += values.join(";") + "\n";
+    }
+
+    return csv;
+}
 
 router.post('/getAvailableTables', async function(req, res, next) {
     try {
@@ -86,15 +125,13 @@ router.post('/login', async function(req, res, next) {
         if (compareResult) {
             // Generate and save session token and send it to the client
             const sessionToken = await bcrypt.hash(username, 10);
-            const sessionTokenData = {
+            sessionTokens[sessionToken] = {
                 username: username,
-                token: sessionToken,
                 role: role
-            }
-
-            sessionTokens.push(sessionTokenData);
+            };
 
             res.cookie('sessionToken', sessionToken, { maxAge: 900000, httpOnly: true });
+            res.cookie('role', role, { maxAge: 900000, httpOnly: false })
             res.status(200);
             res.send("Logged in successfully");
         } else {
@@ -136,15 +173,7 @@ router.get('/checkCookie', function (req, res, next) {
 });
 
 router.get('/admin/getMonthlyChart', async function (req, res, next) {
-    const sessionToken = req.cookies['sessionToken'];
-    if (sessionToken === undefined) {
-        res.status(401).send({error: "Unauthorized"});
-        return;
-    }
-
-    const sessionTokenData = sessionTokens.find(token => token.token === sessionToken);
-    if (sessionTokenData === undefined) {
-        res.status(401).send({error: "Unauthorized"});
+    if (checkIfAuthorized(req, res, next) === false) {
         return;
     }
 
@@ -158,15 +187,7 @@ router.get('/admin/getMonthlyChart', async function (req, res, next) {
 });
 
 router.post('/admin/getDailyChart', async function (req, res, next) {
-    const sessionToken = req.cookies['sessionToken'];
-    if (sessionToken === undefined) {
-        res.status(401).send({error: "Unauthorized"});
-        return;
-    }
-
-    const sessionTokenData = sessionTokens.find(token => token.token === sessionToken);
-    if (sessionTokenData === undefined) {
-        res.status(401).send({error: "Unauthorized"});
+    if (checkIfAuthorized(req, res, next) === false) {
         return;
     }
 
@@ -179,6 +200,69 @@ router.post('/admin/getDailyChart', async function (req, res, next) {
         console.log(err);
         res.status(500).send({error: err});
     }
+});
+
+router.post('/admin/getDailySalesCSV', async function (req, res, next) {
+    if (checkIfAuthorized(req, res, next) === false) {
+        return;
+    }
+
+    const yearMonth = req.body.yearMonth;
+
+    try {
+        const sales = await db.GetMonthDailySales(yearMonth);
+        const csv = jsonToCSV(sales);
+
+        res.status(200).send(csv);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/addCategory', async function (req, res, next) {
+    if (checkIfAuthorized(req, res, next) === false) {
+        return;
+    }
+
+    const categoryName = req.body.addCategoryNameInput;
+
+    try {
+        await db.AddCategory(categoryName);
+        res.status(200).send("Category added successfully");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/addMenuItem', async function (req, res, next) {
+    if (checkIfAuthorized(req, res, next) === false) {
+        return;
+    }
+
+    const name = req.body.addItemNameInput;
+    const description = req.body.addItemDescriptionInput;
+    const retailPrice = req.body.addItemPriceInput;
+    const price = req.body.addItemPriceInput;
+    const category = req.body.categorySelect;
+
+    try {
+        const menuItem = await db.AddMenuItem(name, price, description, category, retailPrice);
+        const menuItemId = menuItem[0].id;
+
+        // loop through all the properties of req.body that contains allergen
+        for (const [key, value] of Object.entries(req.body)) {
+            if (key.includes("allergen")) {
+                await db.AddAllergeneToMenuItem(menuItemId, value);
+            }
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+
+    res.status(200).send("Menu item added successfully");
 });
 
 module.exports = { router, sessionTokens };

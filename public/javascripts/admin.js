@@ -1,5 +1,5 @@
 function redirectToMonth(month) {
-    window.location.href = `/panel/admin/month?yeahMonth=${month}`;
+    window.location.href = `/panel/admin/days?yearMonth=${month}`;
 }
 
 $(document).ready(function() {
@@ -9,13 +9,14 @@ $(document).ready(function() {
         const monthlyData = data;
         const monthlyDates = monthlyData.map(d => {
             const date = new Date(d.month);
-            return date.toLocaleString('default', { month: 'long' });
+            let string = date.toLocaleString('default', { month: 'long' });
+            return string += "-" + date.getFullYear();
         });
         const monthlyPrices = monthlyData.map(d => d.profit);
         const monthlyChart = [{
             x: monthlyDates,
             y: monthlyPrices,
-            type: "bar"
+            type: "scatter"
         }];
         const monthlyLayout = {
             title: "Monthly Profit",

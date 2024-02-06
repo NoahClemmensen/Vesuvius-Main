@@ -1,6 +1,10 @@
 <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" charset="utf-8"></script>
 <script src="/javascripts/adminMonth.js"></script>
-<h1>Daily profit of <%= month %></h1>
+<div class="d-flex align-items-center">
+    <h1>Daily profit of <%= month %></h1>
+    <button class="ms-auto btn btn-outline-success" id="exportButton">Export CSV</button>
+</div>
+
 <div class="d-flex justify-content-center" style="gap: 32px;">
     <table class="table">
         <thead>

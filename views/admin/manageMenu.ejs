@@ -1,0 +1,121 @@
+<script src="/javascripts/manageMenu.js"></script>
+<div id="addCategoryModal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" action="/api/admin/addCategory" method="post">
+            <div class="modal-header">
+                <h5 class="modal-title">Add category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label class="form-label" for="addCategoryNameInput" >Category name</label>
+                <input type="text" name="addCategoryNameInput" placeholder="Summer drinks" required class="form-control" id="addCategoryNameInput" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add category</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="addItemModal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" action="/api/admin/addMenuItem" method="post">
+            <div class="modal-header">
+                <h5 class="modal-title">Add menu item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="addItemNameInput">Item name</label>
+                    <input type="text" name="addItemNameInput" required placeholder="Chicken Alfredo" class="form-control" id="addItemNameInput" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="addItemNameInput">Description</label>
+                    <input type="text" name="addItemDescriptionInput" required placeholder="Creamy Alfredo sauce tossed with..." class="form-control" id="addItemDescriptionInput" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="addItemRetailInput">Item retail sell price</label>
+                    <input type="number" name="addItemRetailInput" required placeholder="75" class="form-control" id="addItemRetailInput" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="addItemPriceInput">Item price (outcome price)</label>
+                    <input type="number" name="addItemPriceInput" required placeholder="54" class="form-control" id="addItemPriceInput" />
+                </div>
+                <div class="mb-3">
+                    <label for="categorySelect" class="form-label">Category to put item</label>
+                    <select required name="categorySelect" class="form-select" id="categorySelect">
+                        <% categories.forEach((category => { %>
+                            <option value="<%= category._id %>"><%= category.name %></option>
+                        <% })); %>
+                    </select>
+                </div>
+                <label class="form-label">Select Allergens:</label>
+                <div class="row">
+                    <% for(var i = 0; i < allergens.length; i++) { %>
+                        <% if(i % 3 === 0) { %>
+                        <div class="row">
+                            <% } %>
+                            <div class="col-sm-4">
+                                <input type="checkbox" class="form-check-input" id="allergen<%= i+1 %>" name="allergen<%= i+1 %>" value="<%= allergens[i]._id %>">
+                                <label for="allergen<%= i+1 %>"><%= allergens[i].allergy %></label><br>
+                            </div>
+                            <% if(i % 3 === 2 || i === allergens.length - 1) { %>
+                        </div>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add menu item</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="container">
+    <div class="row" style="gap: 12px;">
+        <div class="h-100 p-5 text-bg-dark rounded-3 border d-flex flex-column col" style="gap: 32px;" id="menuContainer">
+            <div class="d-flex flex-column" style="gap: 16px;">
+                <% var i = 0; %>
+                <% categories.forEach(function (category) { %>
+                    <h2 id="category_<%= category._id %>"><%= category.name %></h2>
+                    <%
+                        // Filter the menu items based on the category_id
+                        const filteredMenu = menu.filter(item => item.category_id === category._id);
+                    filteredMenu.forEach(function (menuItem) {
+                        i++;
+                    %>
+
+                    <div class="d-flex align-items-center">
+                        <div class="me-auto">
+                            <h5 id="item_<%= menuItem._id %>"><%= i %>. <%= menuItem.name %><% if (!menuItem.flag) { %> <span class="badge text-bg-warning">Unavailable</span><% }%></h5>
+                            <p><em><%= menuItem.description %><br><%= menuItem.Allergen %></em></p>
+                        </div>
+                        <% if (!menuItem.flag) { %>
+                            <del><p><em><%= menuItem.retail_price %> dkk</em></p></del>
+                        <% } else { %>
+                            <p><em><%= menuItem.retail_price %> dkk</em></p>
+                        <% } %>
+                    </div>
+                    <% }); %>
+                <% }) %>
+            </div>
+        </div>
+        <div class="col" style="gap: 16px;">
+            <div class="sticky-top"> <!-- Add this wrapper div -->
+                <div class="p-5 text-bg-dark rounded-3 border d-flex flex-column mb-4" style="gap: 12px;">
+                    <h3>Add category</h3>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Open category modal</button>
+                </div>
+                <div class="p-5 text-bg-dark rounded-3 border d-flex flex-column" style="gap: 12px;">
+                    <h3>Add item</h3>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">Open item modal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

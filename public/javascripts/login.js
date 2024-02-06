@@ -35,6 +35,8 @@ $(document).ready(function () {
                 loginUsernameInput.val('');
                 loginPasswordInput.val('');
 
+                // redirect to /panel/main
+                //window.location.href = '/panel/main';
                 location.reload();
             })
             .catch(function(err) {

@@ -1,0 +1,26 @@
+<div class="d-flex flex-column align-items-center" style="gap:32px;">
+    <div class="h-100 w-50 p-5 text-bg-dark rounded-3 border">
+        <h1>Manage menu</h1>
+        <p>If you want to add, remove and flag menu items and categories. You can do so here</p>
+        <a class="btn btn-outline-primary" href="/panel/admin/manageMenu">Manage menu</a>
+    </div>
+    <div class="h-100 w-50 p-5 text-bg-dark rounded-3 border">
+        <h1>Most popular menu items</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Amount sold</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% tableData.forEach((item =>  { %>
+                    <tr>
+                        <td><%= item.name %></td>
+                        <td><%= item.amount %></td>
+                    </tr>
+                <% })) %>
+            </tbody>
+        </table>
+    </div>
+</div>
