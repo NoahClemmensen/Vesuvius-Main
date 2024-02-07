@@ -1,6 +1,6 @@
 # Café Vesuvius
 ## Beskrivelse
-Dette er en hjemmeside for en fiktiv kaffebar. Det er en simpel hjemmeside med en forside, en menu side, og en kontakt side. Hjemmesiden er bygget ved hjælp af HTML, CSS, og JavaScript.
+Dette er en hjemmeside for en fiktiv kaffebar der hedder Vesuvius. Det er en simpel hjemmeside med en forside, en menu side, og en kontakt side. Hjemmesiden er bygget ved hjælp af HTML, CSS, og JavaScript.
 
 ## Kom godt i gang
 ### Krav
@@ -11,12 +11,21 @@ Dette er en hjemmeside for en fiktiv kaffebar. Det er en simpel hjemmeside med e
 * En terminal
 
 For at komme i gang, kan du simpelthen følge disse trin
-1. Kør den vedhæftede sql setup fil i din server for at sætte databasen op
-2. Klon repositoryet ved hjælp af kommandoen `git clone https://github.com/NoahClemmensen/Vesuvius-Main`
-3. Naviger til repositoryet ved hjælp af terminalen
-4. Kør kommandoen `npm install` for at installere de nødvendige pakker
-5. Kør kommandoen `npm start` for at starte serveren
-6. Tilføj en bruger til user databasetabellen med admin rolle
+1. Klon repository ved hjælp af kommandoen `git clone https://github.com/NoahClemmensen/Vesuvius-Main`
+2. Kør `/sql/setUp.sql` i din server for at sætte databasen op
+3. Ændre connection strengen i `/DatabaseManager.js` til at matche din egen server
+   * Sørg for at enten de begge strenge had adgang til at EXECUTE og SELECT
+   * Eller sørg for at exec_user har adgang til EXECUTE og select_user har adgang til SELECT
+4. Naviger til repository ved hjælp af terminalen
+5. Kør kommandoen `npm install` for at installere de nødvendige pakker
+6. Kør kommandoen `npm start` for at starte serveren
 7. Naviger til hjemmesiden ved hjælp af en webbrowser
-8. Log ind ved hjælp af de legitimationsoplysninger, du oprettede i trin 6
+   * Hjemmesiden kan findes ved at navigere til `{{host-ip}}:3000` i din webbrowser
+   * Hvis du kører hjemmesiden lokalt, kan du finde den ved at navigere til `localhost:3000` i din webbrowser
+8. Log ind ved hjælp af de legitimationsoplysninger, du kan finde i `/sql/setUp.sql`
+   * Du kan komme inde på panelet ved at navigere til `/panel` i din webbrowser
+   * Brugernavn: `Admin`
+   * Adgangskode: `!Admin1234`
 9. Du kan nu tilføje flere medarbejdere og menu elementer til hjemmesiden
+
+**Husk når du er færdig og har lavet en ny admin bruger, at slette den gamle admin bruger fra databasen**
