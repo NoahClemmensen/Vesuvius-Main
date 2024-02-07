@@ -145,4 +145,22 @@ router.get('/admin/manageStaff', async function (req, res, next) {
     res.render('admin/manageStaff', {panel: true, roles: roles.recordset, tableData: users});
 });
 
+router.get('/kitchen', async function (req, res, next) {
+    /* check if client is logged in, if not render login page */
+    if (!checkIfLoggedIn(req, res, false)) {
+        return;
+    }
+
+    res.render('kitchen', {panel: true});
+});
+
+router.get('/orders', async function (req, res, next) {
+    /* check if client is logged in, if not render login page */
+    if (!checkIfLoggedIn(req, res, false)) {
+        return;
+    }
+
+    res.render('orders', {panel: true});
+});
+
 module.exports = router;

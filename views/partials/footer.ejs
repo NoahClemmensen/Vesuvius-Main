@@ -1,1 +1,5 @@
-<footer class="footer">© 2024 Vesuvius - <a href="/about-us">Taber</a></footer>
+<% if (typeof chinese !== 'undefined' && chinese) { %>
+    <footer class="footer">© 2024 维苏威火山 -<a href="/about-us">泰伯</a></footer>
+<% } else { %>
+    <footer class="footer">© 2024 Vesuvius - <a href="/about-us">Taber</a></footer>
+<% } %>

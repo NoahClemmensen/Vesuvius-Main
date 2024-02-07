@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/about-us', function(req, res, next) {
-    res.render('aboutUs', {  });
+    res.render('aboutUs', { chinese: true });
 });
 
 router.get('/reservate', function(req, res, next) {
