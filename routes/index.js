@@ -21,9 +21,8 @@ router.get('/reservate', function(req, res, next) {
 router.get('/menu', async function(req, res, next) {
     try {
         const menu = await db.GetView('menu');
-        console.log(menu);
         const categories = await db.Query('SELECT * FROM Categories WHERE deleted = 0');
-        console.log(categories.recordset);
+
         res.render('menu', { menu: menu, categories: categories.recordset });
     } catch (e) {
         console.log(e);

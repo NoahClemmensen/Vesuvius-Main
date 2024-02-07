@@ -99,11 +99,11 @@
                                 <% if (!menuItem.flag) { %>
                                     <span class="badge text-bg-warning">Unavailable</span>
                                 <% }%>
-                                <a class="badge text-bg-danger delete-item" >Delete</a>
+                                <a class="badge text-bg-danger delete-item" href="/">Delete</a>
                                 <%
                                     var availabilityStatus = menuItem.flag ? "unavailable" : "available";
                                 %>
-                                <a class="badge text-bg-primary flag-item">Mark <%= availabilityStatus %></a>
+                                <a class="badge text-bg-primary flag-item" href="/">Mark <%= availabilityStatus %></a>
                             </h5>
                             <p><em><%= menuItem.description %><br><%= menuItem.Allergen %></em></p>
                         </div>

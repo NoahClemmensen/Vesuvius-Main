@@ -50,7 +50,7 @@ function jsonToCSV(json) {
 router.post('/getAvailableTables', async function(req, res, next) {
     try {
         const tables = await db.GetAvailableTables(req.body.selectedTime);
-
+        console.log(tables);
         res.send(tables);
         res.status(200);
     } catch (e) {
@@ -108,6 +108,16 @@ router.post('/makeReservation', async function(req, res, next) {
 });
 
 router.post('/login', async function(req, res, next) {
+    const sessionToken = req.cookies['sessionToken'];
+    if (sessionToken !== undefined) {
+        const sessionTokenData = sessionTokens[sessionToken];
+        if (sessionTokenData !== undefined) {
+            res.status(200);
+            res.send("Already logged in");
+            return;
+        }
+    }
+
     const username = req.body.username;
     const password = req.body.password;
 
@@ -144,18 +154,20 @@ router.post('/login', async function(req, res, next) {
     }
 });
 
-router.post('/genHashedPassword', async function(req, res, next) {
-    const password = req.body.password;
-
+router.post('/logout', async function(req, res, next) {
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        res.send(hashedPassword);
+        const sessionToken = req.cookies['sessionToken'];
+        delete sessionTokens[sessionToken];
+
+        res.clearCookie('sessionToken');
+        res.clearCookie('role');
         res.status(200);
+        res.send("Logged out successfully");
     } catch (e) {
         console.log(e);
-        res.send(e);
-        res.status(500);
+        res.status(500).send(e);
     }
+
 });
 
 router.get('/checkCookie', function (req, res, next) {
@@ -173,7 +185,7 @@ router.get('/checkCookie', function (req, res, next) {
 });
 
 router.get('/admin/getMonthlyChart', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -187,7 +199,7 @@ router.get('/admin/getMonthlyChart', async function (req, res, next) {
 });
 
 router.post('/admin/getDailyChart', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -203,7 +215,7 @@ router.post('/admin/getDailyChart', async function (req, res, next) {
 });
 
 router.post('/admin/getDailySalesCSV', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -221,7 +233,7 @@ router.post('/admin/getDailySalesCSV', async function (req, res, next) {
 });
 
 router.post('/admin/addCategory', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -237,7 +249,7 @@ router.post('/admin/addCategory', async function (req, res, next) {
 });
 
 router.post('/admin/addMenuItem', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -266,7 +278,7 @@ router.post('/admin/addMenuItem', async function (req, res, next) {
 });
 
 router.post('/admin/deleteMenuItem' , async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -282,7 +294,7 @@ router.post('/admin/deleteMenuItem' , async function (req, res, next) {
 });
 
 router.post('/admin/deleteCategory' , async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -298,7 +310,7 @@ router.post('/admin/deleteCategory' , async function (req, res, next) {
 });
 
 router.post('/admin/flagItem', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, next) === false) {
+    if (checkIfAuthorized(req, res, true) === false) {
         return;
     }
 
@@ -307,6 +319,59 @@ router.post('/admin/flagItem', async function (req, res, next) {
     try {
         await db.FlagMenuItem(menuItemId);
         res.status(200).send("Item flagged successfully");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/removeStaff', async function (req, res, next) {
+    if (checkIfAuthorized(req, res, true) === false) {
+        return;
+    }
+
+    const staffId = req.body.id;
+
+    try {
+        const result = await db.DeleteUser(staffId);
+        res.status(200).send(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/changeStaffRole', async function (req, res, next) {
+    if (checkIfAuthorized(req, res, true) === false) {
+        return;
+    }
+
+    const staffId = req.body.staffId;
+    const roleId = req.body.roleId;
+    console.log(staffId, roleId);
+
+    try {
+        const result = await db.ChangeUserRole(staffId, roleId);
+        res.status(200).send(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/registerStaff', async function (req, res, next) {
+    if (checkIfAuthorized(req, res, true) === false) {
+        return;
+    }
+
+    const username = req.body.registerStaffUsername;
+    const password = req.body.registerStaffPassword;
+    const roleId = req.body.registerRoleSelect;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const result = await db.RegisterUser(username, hashedPassword, roleId);
+        res.status(200).send(result);
     } catch (err) {
         console.log(err);
         res.status(500).send({error: err});

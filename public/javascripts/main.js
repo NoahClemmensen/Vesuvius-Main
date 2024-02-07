@@ -17,3 +17,28 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
+$(document).ready(function() {
+    $logoutBtn = $('.logout-nav li a');
+
+    $logoutBtn.on('click', function() {
+        document.cookie = "";
+        $.post('/api/logout', function() {
+            window.location.href = '/';
+        });
+    });
+
+    const role = getCookie('role');
+    if (role === '1') { // Admin
+        $('#adminNav').show();
+        $('#staffPanelNav').show();
+        $('.logout-nav').show();
+    } else if (role === true) { // Staff
+        $('#adminNav').hide();
+        $('#staffPanelNav').show();
+        $('.logout-nav').show();
+    } else { // Clients
+        $('#adminNav').hide();
+        $('#staffPanelNav').hide();
+        $('.logout-nav').hide();
+    }
+});

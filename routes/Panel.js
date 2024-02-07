@@ -126,15 +126,23 @@ router.get('/admin/manageMenu', async function (req, res, next) {
         const categories = await db.Query('SELECT * FROM Categories WHERE deleted = 0');
         const allergens = await db.Query('SELECT * FROM Allergens');
 
-        console.log(menu);
-        console.log(categories.recordset);
-        console.log(allergens.recordset);
-
         res.render('admin/manageMenu', { menu: menu, categories: categories.recordset, allergens: allergens.recordset, panel: true });
     } catch (e) {
         console.log(e);
         res.status(500).send(e);
     }
+});
+
+router.get('/admin/manageStaff', async function (req, res, next) {
+    /* check if client is logged in, if not render login page */
+    if (!checkIfLoggedIn(req, res, true)) {
+        return;
+    }
+
+    const users = await db.GetView('all_users');
+    const roles = await db.Query('SELECT * FROM user_roles');
+
+    res.render('admin/manageStaff', {panel: true, roles: roles.recordset, tableData: users});
 });
 
 module.exports = router;
