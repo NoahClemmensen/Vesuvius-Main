@@ -35,9 +35,11 @@ $(document).ready(function () {
                 loginUsernameInput.val('');
                 loginPasswordInput.val('');
 
-                // redirect to /panel/main
-                //window.location.href = '/panel/main';
-                location.reload();
+                if(window.location.href === "http://localhost:3000/panel") {
+                    window.location.href = '/panel/main';
+                } else {
+                    location.reload();
+                }
             })
             .catch(function(err) {
                 console.log(err.responseJSON.error);

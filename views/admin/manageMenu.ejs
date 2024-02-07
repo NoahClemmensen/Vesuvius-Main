@@ -82,7 +82,9 @@
             <div class="d-flex flex-column" style="gap: 16px;">
                 <% var i = 0; %>
                 <% categories.forEach(function (category) { %>
-                    <h2 id="category_<%= category._id %>"><%= category.name %></h2>
+                    <h2 data-id="<%= category._id %>"><%= category.name %>
+                        <a class="badge text-bg-danger delete-category">Delete</a>
+                    </h2>
                     <%
                         // Filter the menu items based on the category_id
                         const filteredMenu = menu.filter(item => item.category_id === category._id);
@@ -92,14 +94,20 @@
 
                     <div class="d-flex align-items-center">
                         <div class="me-auto">
-                            <h5 id="item_<%= menuItem._id %>"><%= i %>. <%= menuItem.name %><% if (!menuItem.flag) { %> <span class="badge text-bg-warning">Unavailable</span><% }%></h5>
+                            <h5 data-id="<%= menuItem._id %>">
+                                <%= i %>. <%= menuItem.name %>
+                                <% if (!menuItem.flag) { %>
+                                    <span class="badge text-bg-warning">Unavailable</span>
+                                <% }%>
+                                <a class="badge text-bg-danger delete-item" >Delete</a>
+                                <%
+                                    var availabilityStatus = menuItem.flag ? "unavailable" : "available";
+                                %>
+                                <a class="badge text-bg-primary flag-item">Mark <%= availabilityStatus %></a>
+                            </h5>
                             <p><em><%= menuItem.description %><br><%= menuItem.Allergen %></em></p>
                         </div>
-                        <% if (!menuItem.flag) { %>
-                            <del><p><em><%= menuItem.retail_price %> dkk</em></p></del>
-                        <% } else { %>
-                            <p><em><%= menuItem.retail_price %> dkk</em></p>
-                        <% } %>
+                        <p><em><%= menuItem.retail_price %> dkk</em></p>
                     </div>
                     <% }); %>
                 <% }) %>

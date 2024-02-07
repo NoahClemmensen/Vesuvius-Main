@@ -17,15 +17,3 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
-$(document).ready(function() {
-    const role = getCookie('role');
-    if (role === '1') { // Admin
-        $('#adminNav').show();
-    } else if (role == true) { // Staff
-        $('#adminNav').hide();
-        $('#staffPanelNav').show();
-    } else { // Clients
-        $('#adminNav').hide();
-        $('#staffPanelNav').hide();
-    }
-});

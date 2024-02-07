@@ -19,11 +19,7 @@
                                 <h5><%= i %>. <%= menuItem.name %><% if (!menuItem.flag) { %> <span class="badge text-bg-warning">Unavailable</span><% }%></h5>
                                 <p><em><%= menuItem.description %><br><%= menuItem.Allergen %></em></p>
                             </div>
-                            <% if (!menuItem.flag) { %>
-                                <del><p><em><%= menuItem.retail_price %> dkk</em></p></del>
-                            <% } else { %>
-                                <p><em><%= menuItem.retail_price %> dkk</em></p>
-                            <% } %>
+                            <p><em><%= menuItem.retail_price %> dkk</em></p>
                         </div>
                         <% }); %>
                     <% }) %>

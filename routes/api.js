@@ -265,4 +265,52 @@ router.post('/admin/addMenuItem', async function (req, res, next) {
     res.status(200).send("Menu item added successfully");
 });
 
+router.post('/admin/deleteMenuItem' , async function (req, res, next) {
+    if (checkIfAuthorized(req, res, next) === false) {
+        return;
+    }
+
+    const menuItemId = req.body.menuItemId;
+
+    try {
+        await db.DeleteMenuItem(menuItemId);
+        res.status(200).send("Menu item deleted successfully");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/deleteCategory' , async function (req, res, next) {
+    if (checkIfAuthorized(req, res, next) === false) {
+        return;
+    }
+
+    const categoryId = req.body.categoryId;
+
+    try {
+        await db.DeleteCategory(categoryId);
+        res.status(200).send("Category deleted successfully");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.post('/admin/flagItem', async function (req, res, next) {
+    if (checkIfAuthorized(req, res, next) === false) {
+        return;
+    }
+
+    const menuItemId = req.body.menuItemId;
+
+    try {
+        await db.FlagMenuItem(menuItemId);
+        res.status(200).send("Item flagged successfully");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
 module.exports = { router, sessionTokens };

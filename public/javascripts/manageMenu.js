@@ -14,3 +14,48 @@ $(document).on('submit', 'form', function(e) {
         }
     });
 });
+
+$(document).ready(function() {
+    $deleteItems = $('.delete-item');
+    $deleteCategories = $('.delete-category');
+    $flagItems = $('.flag-item');
+
+    $deleteItems.on('click', function(e) {
+        e.preventDefault();
+        var id = $(this).closest('h5').data('id');
+
+        $.post('/api/admin/deleteMenuItem', {menuItemId: id})
+            .then(function(data) {
+                location.reload();
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+    });
+
+    $deleteCategories.on('click', function(e) {
+        e.preventDefault();
+        var id = $(this).closest('h2').data('id');
+
+        $.post('/api/admin/deleteCategory', {categoryId: id})
+            .then(function(data) {
+                location.reload();
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+    });
+
+    $flagItems.on('click', function(e) {
+        e.preventDefault();
+        var id = $(this).closest('h5').data('id');
+
+        $.post('/api/admin/flagItem', {menuItemId: id})
+            .then(function(data) {
+                location.reload();
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+    });
+});

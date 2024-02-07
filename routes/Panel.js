@@ -123,7 +123,7 @@ router.get('/admin/manageMenu', async function (req, res, next) {
 
     try {
         const menu = await db.GetView('menu');
-        const categories = await db.Query('SELECT * FROM Categories');
+        const categories = await db.Query('SELECT * FROM Categories WHERE deleted = 0');
         const allergens = await db.Query('SELECT * FROM Allergens');
 
         console.log(menu);

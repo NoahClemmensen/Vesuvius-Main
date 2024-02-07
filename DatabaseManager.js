@@ -1,5 +1,7 @@
 const sql = require('mssql')
 
+const connString = "Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False"
+
 class DatabaseManager {
      constructor() {
         this._instance = DatabaseManager;
@@ -16,7 +18,7 @@ class DatabaseManager {
     }
 
     async GetAvailableTables(selectedTime){
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: getAvailableTables
                 const request = new sql.Request();
@@ -33,7 +35,7 @@ class DatabaseManager {
     }
 
     async MakeReservation(time, name, phone) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: make_reservation
                 const request = new sql.Request();
@@ -53,7 +55,7 @@ class DatabaseManager {
     }
 
     async CheckForMatchingLogin(username) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: make_reservation
                 const request = new sql.Request();
@@ -70,7 +72,7 @@ class DatabaseManager {
     }
 
     async AddTableToReservation(table, reservation) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: make_reservation
                 const request = new sql.Request();
@@ -88,7 +90,7 @@ class DatabaseManager {
     }
 
     async GetMonthDailySales(yearMonth) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: getAvailableTables
                 const request = new sql.Request();
@@ -105,7 +107,7 @@ class DatabaseManager {
     }
 
     async AddCategory(categoryName) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: getAvailableTables
                 const request = new sql.Request();
@@ -122,7 +124,7 @@ class DatabaseManager {
     }
 
     async AddMenuItem(itemName, price, description, category_id, retail_price) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: getAvailableTables
                 const request = new sql.Request();
@@ -143,7 +145,7 @@ class DatabaseManager {
     }
 
     async AddAllergeneToMenuItem(itemId, allergenId) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                 // Execute stored procedure with the name: getAvailableTables
                 const request = new sql.Request();
@@ -160,13 +162,64 @@ class DatabaseManager {
             });
     }
 
+    async DeleteMenuItem(itemId) {
+        return sql.connect(connString)
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('item_id', sql.Int, itemId);
+                return request.execute('delete_menu_item')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
+    async DeleteCategory(categoryId) {
+        return sql.connect(connString)
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('category_id', sql.Int, categoryId);
+                return request.execute('delete_category')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
+    async FlagMenuItem(itemId) {
+        return sql.connect(connString)
+            .then(pool => {
+                // Execute stored procedure with the name: getAvailableTables
+                const request = new sql.Request();
+                request.input('item_id', sql.Int, itemId);
+                return request.execute('flag_menu_item')
+            })
+            .then(result => {
+                return result.recordset;
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            });
+    }
+
     async GetView(viewName) {
         const result = await this.Query(`SELECT * FROM ${viewName}`);
         return result.recordset;
     }
 
     async Query(query) {
-        return sql.connect("Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False")
+        return sql.connect(connString)
             .then(pool => {
                return pool.query(query)
             })
