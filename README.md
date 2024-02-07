@@ -29,3 +29,4 @@ For at komme i gang, kan du simpelthen følge disse trin
 9. Du kan nu tilføje flere medarbejdere og menu elementer til hjemmesiden
 
 **Husk når du er færdig og har lavet en ny admin bruger, at slette den gamle admin bruger fra databasen**
+Du kan tilføje dummy data til databasen ved hjælp af de andre sql scripts i `/sql` mappen
