@@ -136,7 +136,7 @@ INSERT INTO Menu_Items (name, price, flag, description, category_id, retail_pric
 VALUES ('Chicken Nuggets', 6, 1, 'Golden crispy chicken nuggets served with your choice of dipping sauce', 1, 8);
 
 INSERT INTO Menu_Items (name, price, flag, description, category_id, retail_price)
-VALUES ('Classic Caesar Salad', 7, 1, 'Fresh romaine lettuce, croutons, parmesan cheese, and Caesar dressing', , 9);
+VALUES ('Classic Caesar Salad', 7, 1, 'Fresh romaine lettuce, croutons, parmesan cheese, and Caesar dressing', 1, 9);
 
 INSERT INTO Menu_Items (name, price, flag, description, category_id, retail_price)
 VALUES ('New York Cheesecake', 8, 1, 'Creamy and rich cheesecake served with a graham cracker crust', 1, 10);
