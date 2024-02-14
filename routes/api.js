@@ -88,6 +88,7 @@ router.post('/makeReservation', async function(req, res, next) {
             req.body.name,
             req.body.phone,
         );
+        console.log(result);
         const reservationId = result[0].ReservationId;
 
         // TODO: Make sure tables are *still* available if two people reservate at the same time
