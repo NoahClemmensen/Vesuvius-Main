@@ -22,8 +22,9 @@ router.get('/menu', async function(req, res, next) {
     try {
         const menu = await db.GetView('menu');
         const categories = await db.Query('SELECT * FROM Categories WHERE deleted = 0');
+        const allergies = await db.Query('SELECT * FROM Allergens');
 
-        res.render('menu', { menu: menu, categories: categories.recordset });
+        res.render('menu', { menu: menu, categories: categories.recordset, allergies: allergies.recordset });
     } catch (e) {
         console.log(e);
         res.status(500).send(e);

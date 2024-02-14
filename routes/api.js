@@ -90,6 +90,8 @@ router.post('/makeReservation', async function(req, res, next) {
         );
         const reservationId = result[0].ReservationId;
 
+        // TODO: Make sure tables are *still* available if two people reservate at the same time
+
         // Add tables to reservation
         for (let i = 0; i < tablesNeeded; i++) {
             await db.AddTableToReservation(
@@ -102,8 +104,8 @@ router.post('/makeReservation', async function(req, res, next) {
         res.send("Reservation made successfully");
     } catch (e) {
         console.log(e)
-        res.send(e);
         res.status(500);
+        res.send(e);
     }
 });
 
