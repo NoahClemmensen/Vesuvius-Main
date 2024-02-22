@@ -22,13 +22,18 @@ $(document).ready(function () {
         const staffId = $(this).data('staffId');
         const roleId = $('#staffRoleSelect').val();
         console.log('role id -> ' + roleId);
-        $.post("/api/admin/changeStaffRole", {staffId: staffId, roleId: roleId})
-            .then(function (data) {
+        $.ajax({
+            url: "/api/admin/changeStaffRole",
+            type: 'POST',
+            data: {staffId: staffId, roleId: roleId},
+            headers: { 'x-api-key': getCookie('api-key') },
+            success: function(data) {
                 location.reload();
-            })
-            .catch(function (error) {
-                alert(error);
-            });
+            },
+            error: function(err) {
+                alert(err);
+            }
+        });
     });
 });
 

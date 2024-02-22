@@ -33,6 +33,8 @@ app.use('/users', usersRouter);
 app.use('/panel', panelRouter);
 app.use('/api', apiRouter.router);
 
+// TODO: Add security middleware that checks for xss and sql injection
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

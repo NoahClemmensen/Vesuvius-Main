@@ -24,38 +24,53 @@ $(document).ready(function() {
         e.preventDefault();
         var id = $(this).closest('h5').data('id');
 
-        $.post('/api/admin/deleteMenuItem', {menuItemId: id})
-            .then(function(data) {
+        $.ajax({
+            url: '/api/admin/deleteMenuItem',
+            type: 'POST',
+            data: {menuItemId: id},
+            headers: { 'x-api-key': getCookie('api-key') },
+            success: function(data) {
                 location.reload();
-            })
-            .catch(function(err) {
+            },
+            error: function(err) {
                 console.log(err);
-            });
+            }
+        });
     });
 
     $deleteCategories.on('click', function(e) {
         e.preventDefault();
         var id = $(this).closest('h2').data('id');
 
-        $.post('/api/admin/deleteCategory', {categoryId: id})
-            .then(function(data) {
+        $.ajax({
+            url: '/api/admin/deleteCategory',
+            type: 'POST',
+            data: {categoryId: id},
+            headers: { 'x-api-key': getCookie('api-key') },
+            success: function(data) {
                 location.reload();
-            })
-            .catch(function(err) {
+            },
+            error: function(err) {
                 console.log(err);
-            });
+            }
+        });
     });
 
     $flagItems.on('click', function(e) {
         e.preventDefault();
         var id = $(this).closest('h5').data('id');
 
-        $.post('/api/admin/flagItem', {menuItemId: id})
-            .then(function(data) {
+        $.ajax({
+            url: '/api/admin/flagItem',
+            type: 'POST',
+            data: {menuItemId: id},
+            headers: { 'x-api-key': getCookie('api-key') },
+            success: function(data) {
                 location.reload();
-            })
-            .catch(function(err) {
+            },
+            error: function(err) {
                 console.log(err);
-            });
+            }
+        });
     });
 });

@@ -7,34 +7,49 @@ var router = express.Router();
 const db = DatabaseManager.getInstance();
 const adminRoleId = 1;
 
+const API_ACCESS_LEVELS = {
+    ADMIN: 1,
+    STAFF: 2,
+    CUSTOMER: 3
+};
+
 var sessionTokens = {};
 
-function checkIfHasAdminPermission(cookie) {
-    return cookie.role === adminRoleId;
+
+function authenticateApiKey(requiredAccessLevel) {
+    return function(req, res, next) {
+        const apiKey = req.headers['x-api-key'];
+        if (!apiKey) {
+            res.status(401).send({error: "Unauthorized: No API key provided"});
+            return;
+        }
+
+        db.CheckApiKey(apiKey)
+            .then(accessLevel => {
+                if (accessLevel.length === 0) {
+                    res.status(401).send({error: "Unauthorized: Invalid API key"});
+                    return;
+                }
+
+                if (accessLevel[0].access_level > requiredAccessLevel) {
+                    res.status(403).send({error: "Forbidden: Insufficient access level"});
+                    return;
+                }
+
+                next();
+            })
+            .catch(err => {
+                console.error(err);
+                res.status(500).send({error: "Server error"});
+            });
+    }
 }
 
-function checkIfAuthorized(req, res, adminRequired = false) {
-    const sessionToken = req.cookies['sessionToken'];
-    if (sessionToken === undefined) {
-        res.status(401).send({error: "Unauthorized"});
-        return false;
-    }
-
-    const sessionTokenData = sessionTokens[sessionToken];
-    if (sessionTokenData === undefined) {
-        res.status(401).send({error: "Unauthorized"});
-        return false;
-    }
-
-
-    if (adminRequired) {
-        if (!checkIfHasAdminPermission(sessionTokenData)){
-            res.status(401).send({error: "Unauthorized"});
-            return false;
-        } else return true;
-    } else return true;
-}
-
+/**
+ * Convert JSON to CSV.
+ * @param {Object} json - The JSON object.
+ * @return {string} The CSV string.
+ */
 function jsonToCSV(json) {
     const keys = Object.keys(json[0]);
     let csv = keys.join(";") + "\n";
@@ -47,7 +62,7 @@ function jsonToCSV(json) {
     return csv;
 }
 
-router.post('/getAvailableTables', async function(req, res, next) {
+router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     try {
         const tables = await db.GetAvailableTables(req.body.selectedTime);
         console.log(tables);
@@ -59,7 +74,7 @@ router.post('/getAvailableTables', async function(req, res, next) {
     }
 });
 
-router.post('/makeReservation', async function(req, res, next) {
+router.post('/makeReservation', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     // Check if reservation time is in the future
     const now = new Date();
     const reservationTime = new Date(req.body.time);
@@ -88,10 +103,10 @@ router.post('/makeReservation', async function(req, res, next) {
             req.body.name,
             req.body.phone,
         );
-        console.log(result);
+
         const reservationId = result[0].ReservationId;
 
-        // TODO: Make sure tables are *still* available if two people reservate at the same time
+        // TODO: Make sure tables are *still* available if two people reservation at the same time
 
         // Add tables to reservation
         for (let i = 0; i < tablesNeeded; i++) {
@@ -145,6 +160,13 @@ router.post('/login', async function(req, res, next) {
 
             res.cookie('sessionToken', sessionToken, { maxAge: 900000, httpOnly: true });
             res.cookie('role', role, { maxAge: 900000, httpOnly: false })
+
+            if (role === adminRoleId) {
+                res.cookie('api-key', 'admin', { maxAge: 900000, httpOnly: false })
+            } else {
+                res.cookie('api-key', 'staff', { maxAge: 900000, httpOnly: false })
+            }
+
             res.status(200);
             res.send("Logged in successfully");
         } else {
@@ -187,11 +209,7 @@ router.get('/checkCookie', function (req, res, next) {
     }
 });
 
-router.get('/admin/getMonthlyChart', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.get('/admin/getMonthlyChart', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     try {
         const sales = await db.GetView("monthly_sales");
         res.status(200).send(sales);
@@ -201,11 +219,7 @@ router.get('/admin/getMonthlyChart', async function (req, res, next) {
     }
 });
 
-router.post('/admin/getDailyChart', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/getDailyChart' , authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const yearMonth = req.body.yearMonth;
 
     try {
@@ -217,11 +231,7 @@ router.post('/admin/getDailyChart', async function (req, res, next) {
     }
 });
 
-router.post('/admin/getDailySalesCSV', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/getDailySalesCSV', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const yearMonth = req.body.yearMonth;
 
     try {
@@ -235,11 +245,7 @@ router.post('/admin/getDailySalesCSV', async function (req, res, next) {
     }
 });
 
-router.post('/admin/addCategory', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/addCategory', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const categoryName = req.body.addCategoryNameInput;
 
     try {
@@ -251,11 +257,7 @@ router.post('/admin/addCategory', async function (req, res, next) {
     }
 });
 
-router.post('/admin/addMenuItem', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/addMenuItem', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const name = req.body.addItemNameInput;
     const description = req.body.addItemDescriptionInput;
     const retailPrice = req.body.addItemPriceInput;
@@ -280,11 +282,7 @@ router.post('/admin/addMenuItem', async function (req, res, next) {
     res.status(200).send("Menu item added successfully");
 });
 
-router.post('/admin/deleteMenuItem' , async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/deleteMenuItem', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const menuItemId = req.body.menuItemId;
 
     try {
@@ -296,11 +294,7 @@ router.post('/admin/deleteMenuItem' , async function (req, res, next) {
     }
 });
 
-router.post('/admin/deleteCategory' , async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/deleteCategory', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const categoryId = req.body.categoryId;
 
     try {
@@ -312,11 +306,7 @@ router.post('/admin/deleteCategory' , async function (req, res, next) {
     }
 });
 
-router.post('/admin/flagItem', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/flagItem', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const menuItemId = req.body.menuItemId;
 
     try {
@@ -328,11 +318,7 @@ router.post('/admin/flagItem', async function (req, res, next) {
     }
 });
 
-router.post('/admin/removeStaff', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/removeStaff', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const staffId = req.body.id;
 
     try {
@@ -344,11 +330,7 @@ router.post('/admin/removeStaff', async function (req, res, next) {
     }
 });
 
-router.post('/admin/changeStaffRole', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/changeStaffRole', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const staffId = req.body.staffId;
     const roleId = req.body.roleId;
     console.log(staffId, roleId);
@@ -362,11 +344,7 @@ router.post('/admin/changeStaffRole', async function (req, res, next) {
     }
 });
 
-router.post('/admin/registerStaff', async function (req, res, next) {
-    if (checkIfAuthorized(req, res, true) === false) {
-        return;
-    }
-
+router.post('/admin/registerStaff', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const username = req.body.registerStaffUsername;
     const password = req.body.registerStaffPassword;
     const roleId = req.body.registerRoleSelect;

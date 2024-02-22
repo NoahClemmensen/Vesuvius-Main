@@ -127,6 +127,19 @@ class DatabaseManager {
         return this.executeStoredProcedure('add_user', inputs);
     }
 
+    async CheckApiKey(apiKey) {
+        const inputs = [
+            { name: 'api_key', type: sql.NVarChar, value: apiKey }
+        ];
+        return this.executeStoredProcedure('check_api_key', inputs);
+    }
+
+    /**
+     * Execute a stored procedure.
+     * @param {string} storedProcedureName - The name of the stored procedure.
+     * @param {Array} inputs - The inputs for the stored procedure.
+     * @return {Promise} A promise that resolves to the result of the stored procedure.
+     */
     async executeStoredProcedure(storedProcedureName, inputs) {
         try {
             const cnn = await sql.connect(execUser);
@@ -146,24 +159,34 @@ class DatabaseManager {
         }
     }
 
+    /**
+     * Get a view.
+     * @param {string} viewName - The name of the view.
+     * @return {Promise} A promise that resolves to the result of the query.
+     */
     async GetView(viewName) {
         const result = await this.Query(`SELECT * FROM ${viewName}`);
         return result.recordset;
     }
 
+    /**
+     * Execute a query.
+     * @param {string} query - The query to execute.
+     * @return {Promise} A promise that resolves to the result of the query.
+     */
     async Query(query) {
-         try {
-             const cnn = await sql.connect(viewUser)
+        try {
+            const cnn = await sql.connect(viewUser)
 
-             const result = await sql.query(query);
+            const result = await sql.query(query);
 
-             cnn.close();
+            cnn.close();
 
-             return result;
-         } catch (error) {
-             console.log(error);
-             throw error;
-         }
+            return result;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
     }
 }
 

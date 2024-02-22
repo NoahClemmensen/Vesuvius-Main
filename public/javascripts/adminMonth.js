@@ -12,17 +12,23 @@ $(document).ready(function() {
             yearMonth: urlParams.get('yearMonth')
         };
         console.log(yearMonth)
-        $.post("/api/admin/getDailySalesCSV", yearMonth).then(function(data) {
-            console.log(data);
-            // Download the CSV file
-            const blob = new Blob([data], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'sales.csv'; // or any other filename you want
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        $.ajax({
+            url: "/api/admin/getDailySalesCSV",
+            type: 'POST',
+            data: yearMonth,
+            headers: { 'x-api-key': $.cookie('api-key') },
+            success: function(data) {
+                console.log(data);
+                // Download the CSV file
+                const blob = new Blob([data], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'sales.csv'; // or any other filename you want
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
         });
     });
 
@@ -33,24 +39,30 @@ $(document).ready(function() {
 
 
     // Get monthly data and plotly chart
-    $.post("/api/admin/getDailyChart", yearMonth).then(function(data) {
-        const monthlyData = data;
-        const monthlyDates = monthlyData.map(d => d.day);
-        const monthlyPrices = monthlyData.map(d => d.profit);
-        const monthlyChart = [{
-            x: monthlyDates,
-            y: monthlyPrices,
-            type: "scatter",
-        }];
-        const monthlyLayout = {
-            title: "Daily Profit",
-            xaxis: {
-                title: "Day"
-            },
-            yaxis: {
-                title: "Profit"
-            },
-        };
-        Plotly.newPlot($monthlyChartContainer[0], monthlyChart, monthlyLayout);
+    $.ajax({
+        url: "/api/admin/getDailyChart",
+        type: 'POST',
+        data: yearMonth,
+        headers: { 'x-api-key': $.cookie('api-key') },
+        success: function(data) {
+            const monthlyData = data;
+            const monthlyDates = monthlyData.map(d => d.day);
+            const monthlyPrices = monthlyData.map(d => d.profit);
+            const monthlyChart = [{
+                x: monthlyDates,
+                y: monthlyPrices,
+                type: "scatter",
+            }];
+            const monthlyLayout = {
+                title: "Daily Profit",
+                xaxis: {
+                    title: "Day"
+                },
+                yaxis: {
+                    title: "Profit"
+                },
+            };
+            Plotly.newPlot($monthlyChartContainer[0], monthlyChart, monthlyLayout);
+        }
     });
 });
