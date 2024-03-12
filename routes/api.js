@@ -74,6 +74,7 @@ function jsonToCSV(json) {
     return csv;
 }
 
+/*
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send(todoItems);
 });
@@ -148,7 +149,7 @@ router.post('/makeReservation', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), 
     }
 });
 
-/*
+
 router.post('/genPass', async function(req, res, next) {
     const password = req.body.password;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -180,10 +181,7 @@ router.post('/login', async function(req, res, next) {
             return;
         }
         const role = userResult[0].role;
-
-        console.log(password, userResult[0].password)
         const compareResult = await bcrypt.compare(password, userResult[0].password);
-        console.log(compareResult);
 
         if (compareResult) {
             // Generate and save session token and send it to the client
@@ -197,15 +195,14 @@ router.post('/login', async function(req, res, next) {
             res.cookie('role', role, { maxAge: 900000, httpOnly: false })
 
             if (role === adminRoleId) {
-                print("admin: " + process.env.API_KEY_ADMIN)
                 res.cookie('api-key', process.env.API_KEY_ADMIN, { maxAge: 900000, httpOnly: false })
+                res.send({apiKey: process.env.API_KEY_ADMIN});
             } else {
-                print("staff: " + process.env.API_KEY_STAFF)
                 res.cookie('api-key', process.env.API_KEY_STAFF, { maxAge: 900000, httpOnly: false })
+                res.send({apiKey: process.env.API_KEY_STAFF});
             }
 
             res.status(200);
-            res.send("Logged in successfully");
         } else {
             res.status(500);
             res.json({error: "Invalid username or password"});
