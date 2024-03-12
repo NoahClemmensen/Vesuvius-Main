@@ -159,7 +159,7 @@ router.get('/orders', async function (req, res, next) {
         return;
     }
 
-    res.render('ordersc', {panel: true});
+    res.render('orders', {panel: true});
 });
 
 module.exports = router;

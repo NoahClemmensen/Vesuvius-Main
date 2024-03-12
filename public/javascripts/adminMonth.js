@@ -16,7 +16,7 @@ $(document).ready(function() {
             url: "/api/admin/getDailySalesCSV",
             type: 'POST',
             data: yearMonth,
-            headers: { 'x-api-key': $.cookie('api-key') },
+            headers: { 'x-api-key': getCookie('api-key') },
             success: function(data) {
                 // Download the CSV file
                 const blob = new Blob([data], { type: 'text/csv' });
@@ -42,7 +42,7 @@ $(document).ready(function() {
         url: "/api/admin/getDailyChart",
         type: 'POST',
         data: yearMonth,
-        headers: { 'x-api-key': $.cookie('api-key') },
+        headers: { 'x-api-key': getCookie('api-key') },
         success: function(data) {
             const monthlyData = data;
             const monthlyDates = monthlyData.map(d => d.day);

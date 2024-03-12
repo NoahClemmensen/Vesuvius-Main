@@ -7,7 +7,7 @@ $(document).ready(function() {
     // Get monthly data and plotly chart
     $.ajax({
         url: "/api/admin/getMonthlyChart",
-        headers: { 'x-api-key': $.cookie('api-key') },
+        headers: { 'x-api-key': getCookie('api-key') },
         success: function(data) {
             const monthlyData = data;
             const monthlyDates = monthlyData.map(d => {
