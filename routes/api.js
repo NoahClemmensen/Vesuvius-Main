@@ -14,7 +14,18 @@ const API_ACCESS_LEVELS = {
 };
 
 var sessionTokens = {};
-
+var todoItems = [
+    {
+        Id: 1,
+        Title: "Do the dishes",
+        IsComplete: false
+    },
+    {
+        Id: 2,
+        Title: "Walk the dog",
+        IsComplete: true
+    },
+];
 
 function authenticateApiKey(requiredAccessLevel) {
     return function(req, res, next) {
@@ -61,6 +72,27 @@ function jsonToCSV(json) {
 
     return csv;
 }
+
+
+router.post('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    todoItems[req.body.Id] = req.body;
+    console.log(req.body)
+    res.status(200).send(todoItems);
+});
+
+router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    res.status(200).send(todoItems);
+});
+
+router.put('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    todoItems[req.body.Id] = req.body;
+    res.status(200).send(todoItems);
+});
+
+router.delete('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    delete todoItems[req.body.Id];
+    res.status(200).send(todoItems);
+});
 
 router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     try {
