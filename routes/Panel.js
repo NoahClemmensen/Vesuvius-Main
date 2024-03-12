@@ -74,7 +74,6 @@ router.get('/admin/months', async function (req, res, next) {
     // Load to table like in main panel
     try {
         const sales = await db.GetView("monthly_sales");
-        console.log(sales);
         res.render('admin/monthProfit', {panel: true, tableData: sales});
     } catch (err) {
         console.log(err);
@@ -160,7 +159,7 @@ router.get('/orders', async function (req, res, next) {
         return;
     }
 
-    res.render('orders', {panel: true});
+    res.render('ordersc', {panel: true});
 });
 
 module.exports = router;

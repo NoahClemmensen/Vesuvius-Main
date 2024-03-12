@@ -1,5 +1,4 @@
 function removeStaff(id) {
-    console.log(id);
     $.post("/api/admin/removeStaff", {id: id})
         .then(function (data) {
             location.reload();
@@ -21,7 +20,7 @@ $(document).ready(function () {
     $changeStaffRoleBtn.on('click', function () {
         const staffId = $(this).data('staffId');
         const roleId = $('#staffRoleSelect').val();
-        console.log('role id -> ' + roleId);
+
         $.ajax({
             url: "/api/admin/changeStaffRole",
             type: 'POST',
@@ -46,6 +45,7 @@ $(document).on('submit', 'form', function(e) {
     $.ajax({
         type: "POST",
         url: url,
+        headers: { 'x-api-key': getCookie('api-key') },
         data: form.serialize(), // Serialize the form data for the POST request
         success: function(data)
         {

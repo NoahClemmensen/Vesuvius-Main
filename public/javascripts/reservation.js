@@ -103,11 +103,8 @@ $(document).ready(function() {
             time: sanitizeInput(timeInput.val().trim())
         };
 
-        console.log(newReservation);
-
         $.post("/api/makeReservation", newReservation)
             .then(function(data) {
-                console.log(data);
                 // Tell user that reservation has been made and then empty all fields
                 nameInput.val("");
                 phoneInput.val("");

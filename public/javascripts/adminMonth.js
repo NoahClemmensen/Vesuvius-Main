@@ -1,6 +1,6 @@
 $(document).ready(function() {
     const urlParams = new URLSearchParams(window.location.search);
-    console.log(urlParams.get('yearMonth'));
+
 
     const $monthlyChartContainer = $("#dailyChartContainer");
     const $exportButton = $("#exportButton");
@@ -11,14 +11,13 @@ $(document).ready(function() {
         const yearMonth = {
             yearMonth: urlParams.get('yearMonth')
         };
-        console.log(yearMonth)
+
         $.ajax({
             url: "/api/admin/getDailySalesCSV",
             type: 'POST',
             data: yearMonth,
             headers: { 'x-api-key': $.cookie('api-key') },
             success: function(data) {
-                console.log(data);
                 // Download the CSV file
                 const blob = new Blob([data], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);

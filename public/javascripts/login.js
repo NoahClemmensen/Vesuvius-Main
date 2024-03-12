@@ -30,7 +30,6 @@ $(document).ready(function () {
 
         $.post("/api/login", loginData)
             .then(function(data) {
-                console.log(data);
                 hideError();
                 loginUsernameInput.val('');
                 loginPasswordInput.val('');

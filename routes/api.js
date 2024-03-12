@@ -97,7 +97,6 @@ router.delete('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async f
 router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     try {
         const tables = await db.GetAvailableTables(req.body.selectedTime);
-        console.log(tables);
         res.send(tables);
         res.status(200);
     } catch (e) {
@@ -171,6 +170,8 @@ router.post('/login', async function(req, res, next) {
     const username = req.body.username;
     const password = req.body.password;
 
+    console.log(username, password);
+
     try {
         const userResult = await db.CheckForMatchingLogin(username);
         if (userResult.length === 0) {
@@ -180,7 +181,9 @@ router.post('/login', async function(req, res, next) {
         }
         const role = userResult[0].role;
 
+        console.log(password, userResult[0].password)
         const compareResult = await bcrypt.compare(password, userResult[0].password);
+        console.log(compareResult);
 
         if (compareResult) {
             // Generate and save session token and send it to the client
