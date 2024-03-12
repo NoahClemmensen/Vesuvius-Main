@@ -1,7 +1,9 @@
 const sql = require('mssql')
+require('dotenv').config();
 
-const execUser = "Server=win-ce80odb6l86; Database=Vesuvius; User Id=exec_user;Password=exec1234;Encrypt=False";
-const viewUser = "Server=win-ce80odb6l86; Database=Vesuvius; User Id=view_user;Password=view1234;Encrypt=False";
+const execUser = process.env.DB_EXEC_USER_CONN_STRING;
+const viewUser = process.env.DB_VIEW_USER_CONN_STRING;
+
 class DatabaseManager {
      constructor() {
         this._instance = DatabaseManager;

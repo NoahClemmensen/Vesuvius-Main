@@ -59,7 +59,7 @@ $(document).ready(function() {
     $flagItems.on('click', function(e) {
         e.preventDefault();
         var id = $(this).closest('h5').data('id');
-
+        console.log("ApiKey: " + getCookie('api-key'));
         $.ajax({
             url: '/api/admin/flagItem',
             type: 'POST',

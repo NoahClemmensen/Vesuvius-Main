@@ -1,5 +1,6 @@
 const DatabaseManager = require("../DatabaseManager");
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 var express = require('express');
 var router = express.Router();
@@ -77,6 +78,14 @@ router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async func
     res.status(200).send(todoItems);
 });
 
+router.get('/staffAndUp', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    res.status(200).send("You are staff");
+});
+
+router.get('/adminOnly', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function(req, res, next) {
+    res.status(200).send("You are admin");
+});
+
 router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     try {
         const tables = await db.GetAvailableTables(req.body.selectedTime);
@@ -139,6 +148,14 @@ router.post('/makeReservation', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), 
     }
 });
 
+/*
+router.post('/genPass', async function(req, res, next) {
+    const password = req.body.password;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    res.send(hashedPassword);
+});
+*/
+
 router.post('/login', async function(req, res, next) {
     const sessionToken = req.cookies['sessionToken'];
     if (sessionToken !== undefined) {
@@ -180,9 +197,11 @@ router.post('/login', async function(req, res, next) {
             res.cookie('role', role, { maxAge: 900000, httpOnly: false })
 
             if (role === adminRoleId) {
-                res.cookie('api-key', 'admin', { maxAge: 900000, httpOnly: false })
+                print("admin: " + process.env.API_KEY_ADMIN)
+                res.cookie('api-key', process.env.API_KEY_ADMIN, { maxAge: 900000, httpOnly: false })
             } else {
-                res.cookie('api-key', 'staff', { maxAge: 900000, httpOnly: false })
+                print("staff: " + process.env.API_KEY_STAFF)
+                res.cookie('api-key', process.env.API_KEY_STAFF, { maxAge: 900000, httpOnly: false })
             }
 
             res.status(200);
