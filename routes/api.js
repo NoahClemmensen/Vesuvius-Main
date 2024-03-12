@@ -196,10 +196,10 @@ router.post('/login', async function(req, res, next) {
 
             if (role === adminRoleId) {
                 res.cookie('api-key', process.env.API_KEY_ADMIN, { maxAge: 900000, httpOnly: false })
-                res.send({apiKey: process.env.API_KEY_ADMIN});
+                res.send({key: process.env.API_KEY_ADMIN});
             } else {
                 res.cookie('api-key', process.env.API_KEY_STAFF, { maxAge: 900000, httpOnly: false })
-                res.send({apiKey: process.env.API_KEY_STAFF});
+                res.send({key: process.env.API_KEY_STAFF});
             }
 
             res.status(200);
