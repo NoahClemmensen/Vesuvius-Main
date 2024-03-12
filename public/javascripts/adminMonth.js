@@ -54,6 +54,8 @@ $(document).ready(function() {
             }];
             const monthlyLayout = {
                 title: "Daily Profit",
+                width: 570,
+                height: 400,
                 xaxis: {
                     title: "Day"
                 },

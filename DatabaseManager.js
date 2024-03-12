@@ -1,6 +1,5 @@
 const sql = require('mssql')
 
-const connString = "Server=win-ce80odb6l86; Database=Vesuvius; User Id=Nba;Password=Admin;Encrypt=False"
 const execUser = "Server=win-ce80odb6l86; Database=Vesuvius; User Id=exec_user;Password=exec1234;Encrypt=False";
 const viewUser = "Server=win-ce80odb6l86; Database=Vesuvius; User Id=view_user;Password=view1234;Encrypt=False";
 class DatabaseManager {

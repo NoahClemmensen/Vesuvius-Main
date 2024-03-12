@@ -23,6 +23,8 @@ $(document).ready(function() {
             }];
             const monthlyLayout = {
                 title: "Monthly Profit",
+                width: 570,
+                height: 400,
                 xaxis: {
                     title: "Date",
                     autorange: 'reversed' // Reverse the date axis

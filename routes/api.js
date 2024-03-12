@@ -73,24 +73,7 @@ function jsonToCSV(json) {
     return csv;
 }
 
-
-router.post('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    todoItems[req.body.Id] = req.body;
-    console.log(req.body)
-    res.status(200).send(todoItems);
-});
-
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    res.status(200).send(todoItems);
-});
-
-router.put('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    todoItems[req.body.Id] = req.body;
-    res.status(200).send(todoItems);
-});
-
-router.delete('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    delete todoItems[req.body.Id];
     res.status(200).send(todoItems);
 });
 
