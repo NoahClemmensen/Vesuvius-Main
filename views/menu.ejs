@@ -1,8 +1,9 @@
 <div class="d-flex justify-content-center align-items-center">
     <div class="d-flex flex-column" style="gap: 16px;">
         <h1 class="text-center">Menu</h1>
-        <div class="d-flex justify-content-center">
-            <div class="h-100 p-5 text-bg-dark rounded-3 border w-60 d-flex flex-column" style="gap: 32px;" id="menuContainer">
+        <div class="d-flex justify-content-center gap-3" >
+            <div class="h-100 p-5 text-bg-dark rounded-3 border w-60 d-flex flex-column" style="gap: 32px;"
+                 id="menuContainer">
                 <div class="d-flex flex-column" style="gap: 16px;">
                     <% var i = 0; %>
                     <% categories.forEach(function (category) { %>
@@ -16,7 +17,10 @@
 
                         <div class="d-flex align-items-center">
                             <div class="me-auto">
-                                <h5><%= i %>. <%= menuItem.name %><% if (!menuItem.flag) { %> <span class="badge text-bg-warning">Unavailable</span><% }%></h5>
+                                <h5><%= i %>. <%= menuItem.name %>
+                                    <% if (!menuItem.flag) { %> <span class="badge text-bg-warning">Unavailable</span>
+                                    <% } %>
+                                </h5>
                                 <p><em><%= menuItem.description %><br><%= menuItem.Allergen %></em></p>
                             </div>
                             <p><em><%= menuItem.retail_price %> dkk</em></p>
@@ -25,9 +29,8 @@
                     <% }) %>
                 </div>
             </div>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div class="h-100 p-5 text-bg-dark rounded-3 border w-60 d-flex flex-column" style="gap: 32px;">
+            <div class="h-100 p-5 text-bg-dark rounded-3 border w-60 d-flex flex-column sticky-top"
+                 style="gap: 32px;">
                 <h1>Allergies</h1>
                 <div class="d-flex flex-column" style="gap: 16px;">
                     <% allergies.forEach(function (allergy) { %>
