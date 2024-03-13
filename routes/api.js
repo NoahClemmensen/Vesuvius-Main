@@ -163,7 +163,7 @@ router.post('/login', async function(req, res, next) {
         const sessionTokenData = sessionTokens[sessionToken];
         if (sessionTokenData !== undefined) {
             res.status(200);
-            res.send("Already logged in");
+            res.json({error: "Already logged in"});
             return;
         }
     }
@@ -196,10 +196,10 @@ router.post('/login', async function(req, res, next) {
 
             if (role === adminRoleId) {
                 res.cookie('api-key', process.env.API_KEY_ADMIN, { maxAge: 900000, httpOnly: false })
-                res.send({key: process.env.API_KEY_ADMIN});
+                res.json({key: process.env.API_KEY_ADMIN});
             } else {
                 res.cookie('api-key', process.env.API_KEY_STAFF, { maxAge: 900000, httpOnly: false })
-                res.send({key: process.env.API_KEY_STAFF});
+                res.json({key: process.env.API_KEY_STAFF});
             }
 
             res.status(200);
