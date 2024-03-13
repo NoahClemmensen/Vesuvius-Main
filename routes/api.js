@@ -76,7 +76,7 @@ function jsonToCSV(json) {
     return csv;
 }
 
-///* ----- DEBUGGING AND DEV ENDPOINTS -----
+/* ----- DEBUGGING AND DEV ENDPOINTS -----
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send(todoItems);
 });
@@ -94,7 +94,7 @@ router.post('/genPass', async function(req, res, next) {
     const hashedPassword = await bcrypt.hash(password, 10);
     res.send(hashedPassword);
 });
-//*/
+*/
 
 router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     try {
