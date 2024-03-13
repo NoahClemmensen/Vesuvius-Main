@@ -42,6 +42,8 @@ $(document).on('submit', 'form', function(e) {
     var form = $(this);
     var url = form.attr('action');
 
+    console.log("Api Key: " + getCookie('api-key'));
+
     $.ajax({
         type: "POST",
         url: url,

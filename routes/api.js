@@ -36,6 +36,8 @@ function authenticateApiKey(requiredAccessLevel) {
             return;
         }
 
+        console.log("api key: " + apiKey);
+
         db.CheckApiKey(apiKey)
             .then(accessLevel => {
                 if (accessLevel.length === 0) {
@@ -74,7 +76,7 @@ function jsonToCSV(json) {
     return csv;
 }
 
-/*
+///* ----- DEBUGGING AND DEV ENDPOINTS -----
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send(todoItems);
 });
@@ -86,6 +88,13 @@ router.get('/staffAndUp', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async fun
 router.get('/adminOnly', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function(req, res, next) {
     res.status(200).send("You are admin");
 });
+
+router.post('/genPass', async function(req, res, next) {
+    const password = req.body.password;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    res.send(hashedPassword);
+});
+//*/
 
 router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     try {
@@ -148,14 +157,6 @@ router.post('/makeReservation', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), 
         res.send(e);
     }
 });
-
-
-router.post('/genPass', async function(req, res, next) {
-    const password = req.body.password;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    res.send(hashedPassword);
-});
-*/
 
 router.post('/login', async function(req, res, next) {
     const sessionToken = req.cookies['sessionToken'];
