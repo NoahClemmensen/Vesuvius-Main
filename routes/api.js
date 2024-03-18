@@ -30,8 +30,9 @@ var todoItems = [
 
 function authenticateApiKey(requiredAccessLevel) {
     return function(req, res, next) {
-        const apiKey = req.headers['x-api-key'];
+        const apiKey = req.headers['x-api-key'] || req.headers['authorization'].split(' ')[1] || req.cookies['api-key'];
         if (!apiKey) {
+            console.log("No API key provided")
             res.status(401).send({error: "Unauthorized: No API key provided"});
             return;
         }
@@ -41,11 +42,13 @@ function authenticateApiKey(requiredAccessLevel) {
         db.CheckApiKey(apiKey)
             .then(accessLevel => {
                 if (accessLevel.length === 0) {
+                    console.log("Invalid API key")
                     res.status(401).send({error: "Unauthorized: Invalid API key"});
                     return;
                 }
 
                 if (accessLevel[0].access_level > requiredAccessLevel) {
+                    console.log("Insufficient access level")
                     res.status(403).send({error: "Forbidden: Insufficient access level"});
                     return;
                 }
@@ -76,7 +79,7 @@ function jsonToCSV(json) {
     return csv;
 }
 
-/* ----- DEBUGGING AND DEV ENDPOINTS -----
+///* ----- DEBUGGING AND DEV ENDPOINTS -----
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send(todoItems);
 });
@@ -94,7 +97,7 @@ router.post('/genPass', async function(req, res, next) {
     const hashedPassword = await bcrypt.hash(password, 10);
     res.send(hashedPassword);
 });
-*/
+//*/
 
 router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
     try {
@@ -164,6 +167,7 @@ router.post('/login', async function(req, res, next) {
         const sessionTokenData = sessionTokens[sessionToken];
         if (sessionTokenData !== undefined) {
             res.status(200);
+            console.log("Already logged in");
             res.json({error: "Already logged in"});
             return;
         }
@@ -177,6 +181,7 @@ router.post('/login', async function(req, res, next) {
     try {
         const userResult = await db.CheckForMatchingLogin(username);
         if (userResult.length === 0) {
+            console.log("Invalid username or password");
             res.status(500);
             res.json({error: "Invalid username or password"});
             return;
@@ -206,6 +211,7 @@ router.post('/login', async function(req, res, next) {
             res.status(200);
         } else {
             res.status(500);
+            console.log("Invalid username or password")
             res.json({error: "Invalid username or password"});
         }
     } catch (e) {
