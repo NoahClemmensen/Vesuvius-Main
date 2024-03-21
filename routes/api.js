@@ -37,8 +37,6 @@ function authenticateApiKey(requiredAccessLevel) {
             return;
         }
 
-        console.log("api key: " + apiKey);
-
         db.CheckApiKey(apiKey)
             .then(accessLevel => {
                 if (accessLevel.length === 0) {
@@ -79,7 +77,7 @@ function jsonToCSV(json) {
     return csv;
 }
 
-///* ----- DEBUGGING AND DEV ENDPOINTS -----
+/* ----- DEBUGGING AND DEV ENDPOINTS -----
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send(todoItems);
 });
@@ -97,9 +95,9 @@ router.post('/genPass', async function(req, res, next) {
     const hashedPassword = await bcrypt.hash(password, 10);
     res.send(hashedPassword);
 });
-//*/
+*/
 
-router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
+router.post('/getAvailableTables', async function(req, res, next) {
     try {
         const tables = await db.GetAvailableTables(req.body.selectedTime);
         res.send(tables);
@@ -110,7 +108,7 @@ router.post('/getAvailableTables', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER
     }
 });
 
-router.post('/makeReservation', authenticateApiKey(API_ACCESS_LEVELS.CUSTOMER), async function(req, res, next) {
+router.post('/makeReservation', async function(req, res, next) {
     // Check if reservation time is in the future
     const now = new Date();
     const reservationTime = new Date(req.body.time);
@@ -175,8 +173,6 @@ router.post('/login', async function(req, res, next) {
 
     const username = req.body.username;
     const password = req.body.password;
-
-    console.log(username, password);
 
     try {
         const userResult = await db.CheckForMatchingLogin(username);
@@ -247,6 +243,49 @@ router.get('/checkCookie', function (req, res, next) {
     } else {
         res.status(500);
         res.send();
+    }
+});
+
+router.get('/getMenu', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+    try {
+        const menu = await db.GetView('menu');
+        res.status(200).json(menu);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.get('/getTables', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+    try {
+        const tables = await db.GetView('main_overview');
+        console.log(tables);
+        res.status(200).json(tables);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.get('/getCategories', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+    try {
+        const categories = await db.Query('SELECT * FROM categories');
+        console.log(categories)
+        res.status(200).json(categories.recordset);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
+
+router.get('/getMenuItemsByCategory', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+    try {
+        const categoryId = req.query.category;
+        const menuItems = await db.Query('SELECT * FROM menu WHERE category_id = ' + categoryId);
+        res.status(200).json(menuItems.recordset);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
     }
 });
 
