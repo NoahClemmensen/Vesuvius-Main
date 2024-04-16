@@ -135,6 +135,22 @@ class DatabaseManager {
         return this.executeStoredProcedure('check_api_key', inputs);
     }
 
+    async CreateOrder(tableId, notes) {
+        const inputs = [
+            { name: 'table_id', type: sql.Int, value: tableId },
+            { name: 'notes', type: sql.NVarChar, value: notes }
+        ];
+        return this.executeStoredProcedure('create_order', inputs);
+    }
+
+    async AddOrderItem(orderId, menuItemId) {
+        const inputs = [
+            { name: 'order_id', type: sql.Int, value: orderId },
+            { name: 'item_id', type: sql.Int, value: menuItemId }
+        ];
+        return this.executeStoredProcedure('add_order_item', inputs);
+    }
+
     /**
      * Execute a stored procedure.
      * @param {string} storedProcedureName - The name of the stored procedure.

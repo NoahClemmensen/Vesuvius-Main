@@ -15,18 +15,6 @@ const API_ACCESS_LEVELS = {
 };
 
 var sessionTokens = {};
-var todoItems = [
-    {
-        Id: 1,
-        Title: "Do the dishes",
-        IsComplete: false
-    },
-    {
-        Id: 2,
-        Title: "Walk the dog",
-        IsComplete: true
-    },
-];
 
 function authenticateApiKey(requiredAccessLevel) {
     return function(req, res, next) {
@@ -96,6 +84,27 @@ router.post('/genPass', async function(req, res, next) {
     res.send(hashedPassword);
 });
 */
+
+router.post('/sendOrder', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    const menuOptions = req.body.MenuOptions;
+    const notes = req.body.Notes;
+
+    try {
+        const order = await db.CreateOrder(req.body.Table._id, notes);
+        const orderId = order[0].order_id;
+        console.log(req.body);
+
+        for (let i = 0; i < menuOptions.length; i++) {
+            const option = menuOptions[i];
+            await db.AddOrderItem(orderId, option._id);
+        }
+
+        res.status(200).send("Order sent successfully");
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+    }
+});
 
 router.post('/getAvailableTables', async function(req, res, next) {
     try {
@@ -259,7 +268,6 @@ router.get('/getMenu', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async functi
 router.get('/getTables', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
     try {
         const tables = await db.GetView('main_overview');
-        console.log(tables);
         res.status(200).json(tables);
     } catch (err) {
         console.log(err);
@@ -269,8 +277,7 @@ router.get('/getTables', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async func
 
 router.get('/getCategories', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
     try {
-        const categories = await db.Query('SELECT * FROM categories');
-        console.log(categories)
+        const categories = await db.Query('SELECT * FROM categories WHERE deleted = 0');
         res.status(200).json(categories.recordset);
     } catch (err) {
         console.log(err);
@@ -282,6 +289,7 @@ router.get('/getMenuItemsByCategory', authenticateApiKey(API_ACCESS_LEVELS.STAFF
     try {
         const categoryId = req.query.category;
         const menuItems = await db.Query('SELECT * FROM menu WHERE category_id = ' + categoryId);
+
         res.status(200).json(menuItems.recordset);
     } catch (err) {
         console.log(err);
