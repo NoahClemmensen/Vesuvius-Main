@@ -85,13 +85,13 @@ router.post('/genPass', async function(req, res, next) {
 });
 */
 
-router.post('/getWaiterView', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+router.get('/getWaiterView', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     try {
         const tables = await db.GetView('waiter_view');
         res.status(200).json(tables);
     } catch (err) {
         console.log(err);
-        res.status(500).send({error: err});
+        res.status(500).send(err);
     }
 });
 
