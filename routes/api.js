@@ -65,13 +65,19 @@ function jsonToCSV(json) {
     return csv;
 }
 
-/* ----- DEBUGGING AND DEV ENDPOINTS -----
+/*
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send(todoItems);
 });
 
 router.get('/staffAndUp', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send("You are staff");
+});
+
+router.get('/ikfiojf', async function(req, res, next) {
+    const selects = await db.Query('SELECT * FROM test')
+    console.log(selects);
+    res.status(200).send("yay :)");
 });
 
 router.get('/adminOnly', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function(req, res, next) {
@@ -84,6 +90,27 @@ router.post('/genPass', async function(req, res, next) {
     res.send(hashedPassword);
 });
 */
+
+router.get('/getOrders', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    try {
+        var data = []
+
+        const orders = await db.GetView('kitchen_view');
+        for (const order of orders) {
+            var orderData = order;
+
+            const items = await db.Query('select * from order_items_view where order_id = ' + order._id);
+            orderData.items = items.recordset;
+            data.push(orderData);
+        }
+
+        req.status(200).json(data);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+    }
+
+});
 
 router.get('/getWaiterView', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     try {

@@ -20,3 +20,15 @@ footer {
 main {
   padding: 20px;
 }
+
+.card.done .badge {
+  background-color: #5cb85c;
+}
+
+.card.inprogress .badge {
+  background-color: #f0ad4e;
+}
+
+.card.ordered .badge {
+    background-color: #d9534f;
+}

@@ -150,7 +150,19 @@ router.get('/kitchen', async function (req, res, next) {
         return;
     }
 
-    res.render('kitchen', {panel: true});
+    var data = []
+
+    const orders = await db.GetView('kitchen_view');
+    for (const order of orders) {
+        var orderData = order;
+
+        const items = await db.Query('select * from order_items_view where order_id = ' + order._id);
+        orderData.items = items.recordset;
+        data.push(orderData);
+    }
+
+    req.app.set('layout', 'layouts/full-width-light');
+    res.render('kitchen', {panel: true, orderData: data});
 });
 
 router.get('/orders', async function (req, res, next) {
