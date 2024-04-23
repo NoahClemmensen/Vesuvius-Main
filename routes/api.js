@@ -104,7 +104,7 @@ router.get('/getOrders', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async func
             data.push(orderData);
         }
 
-        req.status(200).json(data);
+        res.status(200).json(data);
     } catch (e) {
         console.log(e);
         res.status(500).send(e);

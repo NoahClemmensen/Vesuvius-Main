@@ -1,4 +1,5 @@
 <script src="/javascripts/kitchen.js"></script>
+<script src="/javascripts/ejs.min.js"></script>
 
 
 <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModal">
@@ -33,11 +34,18 @@
     <li class="nav-item">
         <a class="nav-link" data-filter="done">Done</a>
     </li>
+    <!-- Update orders button
+    <li class="nav-item">
+        <button class="btn btn-primary" onclick="updateOrders()">
+            Update
+        </button>
+    </li>
+    -->
 </ul>
 
 
 <div class="d-flex align-items-center">
-    <div class="d-flex flex-wrap mt-3" style="gap: 2rem;">
+    <div id="orders" class="d-flex flex-wrap mt-3" style="gap: 2rem;">
         <% orderData.forEach(order => { %>
             <button type="button" data-orderdate="<%= order.date %>" data-orderid="<%= order._id %>" data-bs-toggle="modal" data-bs-target="#editOrderModal" class="card mb-4 p-0 <%= order.status_name.toLowerCase().replace(/\s/g, '') %>" style="width: 250px;">
                 <div class="card-header d-flex align-items-center" style="gap: 4px;">
