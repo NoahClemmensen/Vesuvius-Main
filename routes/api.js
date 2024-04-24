@@ -311,14 +311,23 @@ router.get('/getTables', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async func
         res.status(500).send({error: err});
     }
 });
-
 router.get('/getTableOverview', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
     try {
         const tables = await db.GetView('table_view');
         res.status(200).json(tables);
     } catch (err) {
         console.log(err);
-        res.status(500).send({error: err});
+        res.status(500).send(err);
+    }
+});
+
+router.get('/getWaiterView', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
+    try {
+        const tables = await db.GetView('waiter_view');
+        res.status(200).json(tables);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
     }
 });
 
@@ -344,6 +353,18 @@ router.get('/getMenuItemsByCategory', authenticateApiKey(API_ACCESS_LEVELS.STAFF
     }
 });
 
+router.get('/getSingleTableOverview', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+    try {
+        const tableNum = req.query.tableNum;
+        const singleTableOverview = await db.Query('Select * from single_table_overview where table_num = ' + tableNum);
+
+        res.status(200).json(singleTableOverview.recordset);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+})
+
 router.get('/admin/getMonthlyChart', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     try {
         const sales = await db.GetView("monthly_sales");
@@ -365,6 +386,29 @@ router.post('/admin/getDailyChart' , authenticateApiKey(API_ACCESS_LEVELS.ADMIN)
         res.status(500).send({error: err});
     }
 });
+
+router.get('/getTotalPriceForTable', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+        const tableNum = req.query.tableNum;
+    try {
+        const price = await db.GetTotalPriceForTable(tableNum);
+        res.status(200).send(price[0]);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+})
+
+router.post('/payForOrder', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+    const orderId = req.body.order;
+    const status = 4;
+    try {
+        await db.ChangeStatus(orderId, status);
+        res.status(200).send("Paid for order");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+})
 
 router.post('/admin/getDailySalesCSV', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const yearMonth = req.body.yearMonth;

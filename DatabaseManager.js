@@ -57,11 +57,26 @@ class DatabaseManager {
         return this.executeStoredProcedure('get_daily_sales', inputs);
     }
 
+    async GetTotalPriceForTable(table) {
+         const inputs = [
+             {name: 'table_num', type: sql.Int, value: table}
+         ];
+         return this.executeStoredProcedure('get_total_price_for_table', inputs);
+    }
+
     async AddCategory(categoryName) {
         const inputs = [
             {name: 'name', type: sql.NVarChar, value: categoryName}
         ];
         return this.executeStoredProcedure('Add_category', inputs);
+    }
+
+    async ChangeStatus(orderId, status) {
+         const inputs = [
+             {name: 'order_id', type: sql.Int, value: orderId},
+             {name: 'status', type: sql.Int, value: status}
+         ];
+         return this.executeStoredProcedure('change_status', inputs);
     }
 
     async AddMenuItem(itemName, price, description, category_id, retail_price) {
