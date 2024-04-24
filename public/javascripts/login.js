@@ -42,8 +42,8 @@ $(document).ready(function () {
                 }
             })
             .catch(function(err) {
-                console.log(err.responseJSON.error);
-                showError(err.responseJSON.error);
+                console.log(err);
+                showError(err);
             });
     });
 });

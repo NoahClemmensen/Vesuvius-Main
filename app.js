@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 const expressLayouts = require('express-ejs-layouts')
 const DatabaseManager = require('./DatabaseManager');
+var cors = require('cors');
 const db = new DatabaseManager();
 
 var indexRouter = require('./routes/index');
@@ -16,6 +17,7 @@ var app = express();
 
 // Set Templating Engine
 app.use(expressLayouts);
+app.use(cors());
 app.set('layout', './layouts/full-width');
 
 // view engine setup
