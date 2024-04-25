@@ -13,11 +13,6 @@ const db = DatabaseManager.getInstance();
 // This matches the DB id's
 // If they are changed, it should change within the db. Find a way to do it dynamically
 const adminRoleId = 1;
-const API_ACCESS_LEVELS = {
-    ADMIN: 1,
-    STAFF: 2,
-    CUSTOMER: 3
-};
 
 // RAM Stored session tokens
 // If restarted people will be logged out.
