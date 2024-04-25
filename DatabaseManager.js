@@ -79,6 +79,14 @@ class DatabaseManager {
          return this.executeStoredProcedure('change_status', inputs);
     }
 
+    async ChangeFlag(tableId){
+         const inputs = [
+             {name: 'table_num', type: sql.Int, value: tableId}
+         ];
+         return this.executeStoredProcedure('mark_in_use', inputs);
+    }
+
+
     async AddMenuItem(itemName, price, description, category_id, retail_price) {
         const inputs = [
             {name: 'name', type: sql.NVarChar, value: itemName},

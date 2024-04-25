@@ -413,7 +413,18 @@ router.post('/payForOrder', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async f
         console.log(err);
         res.status(500).send({error: err});
     }
-})
+});
+
+router.post('/changeFlag', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
+    const tableNum = req.body.tableNum;
+    try {
+        await db.ChangeFlag(tableNum);
+        res.status(200).send("Status changed");
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({error: err});
+    }
+});
 
 router.post('/admin/getDailySalesCSV', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const yearMonth = req.body.yearMonth;
