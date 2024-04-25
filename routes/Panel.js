@@ -163,6 +163,7 @@ router.get('/kitchen', async function (req, res, next) {
 
     req.app.set('layout', 'layouts/full-width-light');
     res.render('kitchen', {panel: true, orderData: data});
+    req.app.set('layout', 'layouts/full-width');
 });
 
 router.get('/orders', async function (req, res, next) {

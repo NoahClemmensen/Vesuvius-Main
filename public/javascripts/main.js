@@ -18,9 +18,10 @@ function getCookie(name) {
 }
 
 $(document).ready(function() {
-    $logoutBtn = $('.logout-nav li a');
+    $logoutBtn = $('#logoutLink');
 
     $logoutBtn.on('click', function() {
+        console.log("Logging out");
         document.cookie = "";
         $.post('/api/logout', function() {
             window.location.href = '/';

@@ -8,6 +8,7 @@ $(document).on('submit', 'form', function(e) {
         type: "POST",
         url: url,
         data: form.serialize(), // Serialize the form data for the POST request
+        headers: { 'x-api-key': getCookie('api-key') },
         success: function(data)
         {
             location.reload(); // Reload the page after the server responds

@@ -35,8 +35,8 @@ $(document).ready(function () {
                 loginPasswordInput.val('');
 
 
-                if(window.location.href === "http://localhost:3000/panel/" || window.location.href === "http://localhost:3000/panel") {
-                    window.location.href = '/panel/main';
+                if(window.location.pathname === "/panel/" || window.location.pathname === "/panel") {
+                    window.location.href = '../panel/main';
                 } else {
                     location.reload();
                 }

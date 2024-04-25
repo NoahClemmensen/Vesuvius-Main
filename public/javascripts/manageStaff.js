@@ -1,13 +1,17 @@
 function removeStaff(id) {
-    $.post("/api/admin/removeStaff", {id: id})
-        .then(function (data) {
+    $.ajax({
+        url: "/api/admin/removeStaff",
+        type: 'POST',
+        data: {id: id},
+        headers: { 'x-api-key': getCookie('api-key') },
+        success: function(data) {
             location.reload();
-        })
-        .catch(function (error) {
-            alert(error);
-        });
+        },
+        error: function(err) {
+            alert(err);
+        }
+    });
 }
-
 function openEditModal(staffId, staffName) {
     $("#changeStaffRoleBtn").data('staffId', staffId);
     $("#staffRoleModalTitle").text("修改" + staffName + "权限");
