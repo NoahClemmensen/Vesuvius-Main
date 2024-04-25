@@ -3,9 +3,9 @@
 --Password:   !Admin1234
 
 
-create database Vesuvius_test22
+create database Vesuvius
 go
-use Vesuvius_test22
+use Vesuvius
 go
 
 create table Allergens
@@ -817,7 +817,7 @@ insert into Tables (num, in_use) values (20, false);
 
 go
 
-USE Vesuvius_test22;
+USE Vesuvius;
 GO
 
 CREATE USER exec_user FOR LOGIN exec_user;
@@ -832,7 +832,7 @@ CREATE LOGIN view_user WITH PASSWORD = 'view1234', CHECK_POLICY = OFF;
 GO
 
 
-USE Vesuvius_test22;
+USE Vesuvius;
 GO
 
 CREATE USER view_user FOR LOGIN view_user;
