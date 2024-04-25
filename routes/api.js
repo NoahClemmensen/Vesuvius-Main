@@ -18,33 +18,37 @@ var sessionTokens = {};
 
 function authenticateApiKey(requiredAccessLevel) {
     return function(req, res, next) {
-        const apiKey = req.headers['x-api-key'] || req.headers['authorization'].split(' ')[1] || req.cookies['api-key'];
-        if (!apiKey) {
-            console.log("No API key provided")
-            res.status(401).send({error: "Unauthorized: No API key provided"});
-            return;
+        try {
+            const apiKey = req.headers['x-api-key'] || req.headers['authorization'].split(' ')[1] || req.cookies['api-key'];
+            if (!apiKey) {
+                console.log("No API key provided")
+                res.status(401).send({error: "Unauthorized: No API key provided"});
+                return;
+            }
+
+            db.CheckApiKey(apiKey)
+                .then(accessLevel => {
+                    if (accessLevel.length === 0) {
+                        console.log("Invalid API key")
+                        res.status(401).send({error: "Unauthorized: Invalid API key"});
+                        return;
+                    }
+
+                    if (accessLevel[0].access_level > requiredAccessLevel) {
+                        console.log("Insufficient access level")
+                        res.status(403).send({error: "Forbidden: Insufficient access level"});
+                        return;
+                    }
+
+                    next();
+                })
+                .catch(err => {
+                    console.error(err);
+                    res.status(500).send({error: "Server error"});
+                });
+        } catch (err) {
+            res.status(401).send({error: "Unauthorized: Insufficient access level"});
         }
-
-        db.CheckApiKey(apiKey)
-            .then(accessLevel => {
-                if (accessLevel.length === 0) {
-                    console.log("Invalid API key")
-                    res.status(401).send({error: "Unauthorized: Invalid API key"});
-                    return;
-                }
-
-                if (accessLevel[0].access_level > requiredAccessLevel) {
-                    console.log("Insufficient access level")
-                    res.status(403).send({error: "Forbidden: Insufficient access level"});
-                    return;
-                }
-
-                next();
-            })
-            .catch(err => {
-                console.error(err);
-                res.status(500).send({error: "Server error"});
-            });
     }
 }
 
@@ -66,6 +70,20 @@ function jsonToCSV(json) {
 }
 
 /*
+router.get('/checkCookie', function (req, res, next) {
+    const sessionToken = req.cookies['sessionToken'];
+
+    const sessionTokenData = sessionTokens.find(token => token.token === sessionToken);
+
+    if (sessionTokenData) {
+        res.status(200);
+        res.send();
+    } else {
+        res.status(500);
+        res.send();
+    }
+});
+
 router.get('/todoitems', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
     res.status(200).send(todoItems);
 });
@@ -278,20 +296,6 @@ router.post('/logout', async function(req, res, next) {
 
 });
 
-router.get('/checkCookie', function (req, res, next) {
-    const sessionToken = req.cookies['sessionToken'];
-    
-    const sessionTokenData = sessionTokens.find(token => token.token === sessionToken);
-
-    if (sessionTokenData) {
-        res.status(200);
-        res.send();
-    } else {
-        res.status(500);
-        res.send();
-    }
-});
-
 router.get('/getMenu', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
     try {
         const menu = await db.GetView('menu');
@@ -311,6 +315,7 @@ router.get('/getTables', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async func
         res.status(500).send({error: err});
     }
 });
+
 router.get('/getTableOverview', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
     try {
         const tables = await db.GetView('table_view');
