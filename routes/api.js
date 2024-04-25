@@ -326,16 +326,6 @@ router.get('/getTableOverview', authenticateApiKey(API_ACCESS_LEVELS.STAFF), asy
     }
 });
 
-router.get('/getWaiterView', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    try {
-        const tables = await db.GetView('waiter_view');
-        res.status(200).json(tables);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-});
-
 router.get('/getCategories', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
     try {
         const categories = await db.Query('SELECT * FROM categories WHERE deleted = 0');
@@ -455,7 +445,7 @@ router.post('/admin/addCategory', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), a
 router.post('/admin/addMenuItem', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
     const name = req.body.addItemNameInput;
     const description = req.body.addItemDescriptionInput;
-    const retailPrice = req.body.addItemPriceInput;
+    const retailPrice = req.body.addItemRetailInput;
     const price = req.body.addItemPriceInput;
     const category = req.body.categorySelect;
 
