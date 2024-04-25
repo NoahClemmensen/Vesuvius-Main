@@ -5,70 +5,25 @@ require('dotenv').config();
 var express = require('express');
 var router = express.Router();
 
-const db = DatabaseManager.getInstance();
-const adminRoleId = 1;
+var adminRouter = require('./adminApi');
+var staffRouter = require('./staffApi');
 
+const db = DatabaseManager.getInstance();
+
+// This matches the DB id's
+// If they are changed, it should change within the db. Find a way to do it dynamically
+const adminRoleId = 1;
 const API_ACCESS_LEVELS = {
     ADMIN: 1,
     STAFF: 2,
     CUSTOMER: 3
 };
 
+// RAM Stored session tokens
+// If restarted people will be logged out.
 var sessionTokens = {};
 
-function authenticateApiKey(requiredAccessLevel) {
-    return function(req, res, next) {
-        try {
-            const apiKey = req.headers['x-api-key'] || req.headers['authorization'].split(' ')[1] || req.cookies['api-key'];
-            if (!apiKey) {
-                console.log("No API key provided")
-                res.status(401).send({error: "Unauthorized: No API key provided"});
-                return;
-            }
-
-            db.CheckApiKey(apiKey)
-                .then(accessLevel => {
-                    if (accessLevel.length === 0) {
-                        console.log("Invalid API key")
-                        res.status(401).send({error: "Unauthorized: Invalid API key"});
-                        return;
-                    }
-
-                    if (accessLevel[0].access_level > requiredAccessLevel) {
-                        console.log("Insufficient access level")
-                        res.status(403).send({error: "Forbidden: Insufficient access level"});
-                        return;
-                    }
-
-                    next();
-                })
-                .catch(err => {
-                    console.error(err);
-                    res.status(500).send({error: "Server error"});
-                });
-        } catch (err) {
-            res.status(401).send({error: "Unauthorized: Insufficient access level"});
-        }
-    }
-}
-
-/**
- * Convert JSON to CSV.
- * @param {Object} json - The JSON object.
- * @return {string} The CSV string.
- */
-function jsonToCSV(json) {
-    const keys = Object.keys(json[0]);
-    let csv = keys.join(";") + "\n";
-
-    for (let i = 0; i < json.length; i++) {
-        const values = Object.values(json[i]);
-        csv += values.join(";") + "\n";
-    }
-
-    return csv;
-}
-
+// Debug request handlers
 /*
 router.get('/checkCookie', function (req, res, next) {
     const sessionToken = req.cookies['sessionToken'];
@@ -109,58 +64,7 @@ router.post('/genPass', async function(req, res, next) {
 });
 */
 
-router.get('/getOrders', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    try {
-        var data = []
-
-        const orders = await db.GetView('kitchen_view');
-        for (const order of orders) {
-            var orderData = order;
-
-            const items = await db.Query('select * from order_items_view where order_id = ' + order._id);
-            orderData.items = items.recordset;
-            data.push(orderData);
-        }
-
-        res.status(200).json(data);
-    } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
-    }
-
-});
-
-router.get('/getWaiterView', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    try {
-        const tables = await db.GetView('waiter_view');
-        res.status(200).json(tables);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-});
-
-router.post('/sendOrder', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function(req, res, next) {
-    const menuOptions = req.body.MenuOptions;
-    const notes = req.body.Notes;
-
-    try {
-        const order = await db.CreateOrder(req.body.Table._id, notes);
-        const orderId = order[0].order_id;
-        console.log(req.body);
-
-        for (let i = 0; i < menuOptions.length; i++) {
-            const option = menuOptions[i];
-            await db.AddOrderItem(orderId, option._id);
-        }
-
-        res.status(200).send("Order sent successfully");
-    } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
-    }
-});
-
+// Request handlers
 router.post('/getAvailableTables', async function(req, res, next) {
     try {
         const tables = await db.GetAvailableTables(req.body.selectedTime);
@@ -296,252 +200,7 @@ router.post('/logout', async function(req, res, next) {
 
 });
 
-router.get('/getMenu', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    try {
-        const menu = await db.GetView('menu');
-        res.status(200).json(menu);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.get('/getTables', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    try {
-        const tables = await db.GetView('main_overview');
-        res.status(200).json(tables);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.get('/getTableOverview', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    try {
-        const tables = await db.GetView('table_view');
-        res.status(200).json(tables);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send(err);
-    }
-});
-
-router.get('/getCategories', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    try {
-        const categories = await db.Query('SELECT * FROM categories WHERE deleted = 0');
-        res.status(200).json(categories.recordset);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.get('/getMenuItemsByCategory', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    try {
-        const categoryId = req.query.category;
-        const menuItems = await db.Query('SELECT * FROM menu WHERE category_id = ' + categoryId);
-
-        res.status(200).json(menuItems.recordset);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.get('/getSingleTableOverview', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    try {
-        const tableNum = req.query.tableNum;
-        const singleTableOverview = await db.Query('Select * from single_table_overview where table_num = ' + tableNum);
-
-        res.status(200).json(singleTableOverview.recordset);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-})
-
-router.get('/admin/getMonthlyChart', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    try {
-        const sales = await db.GetView("monthly_sales");
-        res.status(200).send(sales);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/getDailyChart' , authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const yearMonth = req.body.yearMonth;
-
-    try {
-        const sales = await db.GetMonthDailySales(yearMonth);
-        res.status(200).send(sales);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.get('/getTotalPriceForTable', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-        const tableNum = req.query.tableNum;
-    try {
-        const price = await db.GetTotalPriceForTable(tableNum);
-        res.status(200).send(price[0]);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-})
-
-router.post('/payForOrder', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    const orderId = req.body.order;
-    const status = 4;
-    try {
-        await db.ChangeStatus(orderId, status);
-        res.status(200).send("Paid for order");
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/changeFlag', authenticateApiKey(API_ACCESS_LEVELS.STAFF), async function (req, res, next) {
-    const tableNum = req.body.tableNum;
-    try {
-        await db.ChangeFlag(tableNum);
-        res.status(200).send("Status changed");
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/getDailySalesCSV', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const yearMonth = req.body.yearMonth;
-
-    try {
-        const sales = await db.GetMonthDailySales(yearMonth);
-        const csv = jsonToCSV(sales);
-
-        res.status(200).send(csv);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/addCategory', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const categoryName = req.body.addCategoryNameInput;
-
-    try {
-        await db.AddCategory(categoryName);
-        res.status(200).send("Category added successfully");
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/addMenuItem', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const name = req.body.addItemNameInput;
-    const description = req.body.addItemDescriptionInput;
-    const retailPrice = req.body.addItemRetailInput;
-    const price = req.body.addItemPriceInput;
-    const category = req.body.categorySelect;
-
-    try {
-        const menuItem = await db.AddMenuItem(name, price, description, category, retailPrice);
-        const menuItemId = menuItem[0].id;
-
-        // loop through all the properties of req.body that contains allergen
-        for (const [key, value] of Object.entries(req.body)) {
-            if (key.includes("allergen")) {
-                await db.AddAllergeneToMenuItem(menuItemId, value);
-            }
-        }
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-
-    res.status(200).send("Menu item added successfully");
-});
-
-router.post('/admin/deleteMenuItem', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const menuItemId = req.body.menuItemId;
-
-    try {
-        await db.DeleteMenuItem(menuItemId);
-        res.status(200).send("Menu item deleted successfully");
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/deleteCategory', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const categoryId = req.body.categoryId;
-
-    try {
-        await db.DeleteCategory(categoryId);
-        res.status(200).send("Category deleted successfully");
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/flagItem', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const menuItemId = req.body.menuItemId;
-
-    try {
-        await db.FlagMenuItem(menuItemId);
-        res.status(200).send("Item flagged successfully");
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/removeStaff', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const staffId = req.body.id;
-
-    try {
-        const result = await db.DeleteUser(staffId);
-        res.status(200).send(result);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/changeStaffRole', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const staffId = req.body.staffId;
-    const roleId = req.body.roleId;
-    console.log(staffId, roleId);
-
-    try {
-        const result = await db.ChangeUserRole(staffId, roleId);
-        res.status(200).send(result);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
-
-router.post('/admin/registerStaff', authenticateApiKey(API_ACCESS_LEVELS.ADMIN), async function (req, res, next) {
-    const username = req.body.registerStaffUsername;
-    const password = req.body.registerStaffPassword;
-    const roleId = req.body.registerRoleSelect;
-
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const result = await db.RegisterUser(username, hashedPassword, roleId);
-        res.status(200).send(result);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({error: err});
-    }
-});
+router.use('/admin', adminRouter);
+router.use('/', staffRouter);
 
 module.exports = { router, sessionTokens };
